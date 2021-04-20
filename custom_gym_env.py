@@ -1,7 +1,6 @@
 import gym
 import numpy as np
 
-
 class MDP_Env(gym.Env):
     def __init__(self, n_states, n_actions, seed=None, reward_range=(0, 1)):
         super().__init__()
@@ -45,4 +44,5 @@ mdp = MDP_Env(
         )
 print(mdp.observation_space)
 print(mdp.init_state)
+mdp.reset()
 print(mdp.step(mdp.action_space.sample()))
