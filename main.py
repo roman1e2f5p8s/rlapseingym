@@ -1,6 +1,7 @@
 import numpy as np
 
-from src.mdp import RestaurantMDP
+from src.distribution import Distribution
+from src.mdp import RestaurantMDP, RandomMDP
 from src.rl_algorithms.qlearning import Qlearner
 from src.rl_algorithms.rlapse import RLAPSE
 from src.infhmdp_utils import ValueIteration, expected_reward
@@ -9,8 +10,25 @@ SEED = 1
 TOTAL_TIMESTEPS = 200
 STORE_REWARD = False
 STORE_ESTIMATED_REWARD = True
+N_STATES = 5
+N_ACTIONS = 3
+CONTROLLED = True
+RANK1PAGES = False
 
 np.random.seed(seed=SEED)
+
+P_distribution = Distribution(np.random.gamma, shape=1.0, scale=5.0)
+R_distribution = Distribution(np.random.gamma, shape=0.1, scale=5.0)
+mdp = RandomMDP(
+        n_states=N_STATES,
+        n_actions=N_ACTIONS,
+        controlled=CONTROLLED,
+        rank1pages=RANK1PAGES,
+        P_distribution=P_distribution,
+        R_distribution=R_distribution)
+print(mdp.R)
+print(mdp.P)
+exit()
 
 mdp = RestaurantMDP(epsilon=0.2)
 mdp.validate()
