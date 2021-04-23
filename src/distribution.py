@@ -8,10 +8,29 @@ for line in doc:
 
 class Distribution(object):
     def __init__(self, np_distribution, *args, **kwargs):
-        name = np_distribution.__name__
 
-        assert hasattr(np_random, name) and name in distributions
-        assert 'size' not in kwargs.keys()
+        # error checking ***********************************************************
+        try:
+            name = np_distribution.__name__
+        except AttributeError as e:
+            print('{} is probably not a numpy distribution! See np.random.__doc__ for details.'.\
+                    format(np_distribution))
+            raise e
+
+        try:
+            assert hasattr(np_random, name) and name in distributions
+        except AssertionError as e:
+            print('Unknown numpy distribution: {}! See np.random.__doc__ for details.'.\
+                    format(np_distribution))
+            raise e
+
+        try:
+            assert 'size' not in kwargs.keys()
+        except AssertionError as e:
+            print('Argument \"size\" must not be provided during the initialization! ' +\
+                    'Specify \"size\" when sampling random numbers.')
+            raise e
+        # error checking end *******************************************************
 
         self.name = name
         self.np_distribution = np_distribution

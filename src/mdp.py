@@ -2,16 +2,50 @@ import numpy as np
 from blackhc import mdp
 
 from .distribution import Distribution
+from ._broker_base import _BrokerBase
 
 
 class MDP(mdp.MDPSpec):
     def __init__(self, n_states: int, n_actions: int, P: np.ndarray, R: np.ndarray):
-        assert n_states > 1
-        assert n_actions > 1
-        assert isinstance(P, np.ndarray)
-        assert isinstance(R, np.ndarray)
-        assert P.shape == (n_actions, n_states, n_states)
-        assert R.shape == (n_states, n_actions)
+
+        # error checking ***********************************************************
+        try:
+            assert n_states > 1
+        except AssertionError as e:
+            print('You failed to provide the number of states > 1!')
+            raise e
+
+        try:
+            assert n_actions > 1
+        except AssertionError as e:
+            print('You failed to provide the number of actions > 1!')
+            raise e
+
+        try:
+            assert isinstance(P, np.ndarray)
+        except AssertionError as e:
+            print('Transition probabilities tensor must be a numpy array!')
+            raise e
+
+        try:
+            assert isinstance(R, np.ndarray)
+        except AssertionError as e:
+            print('Reward matrix must be a numpy array!')
+            raise e
+
+        try:
+            assert P.shape == (n_actions, n_states, n_states)
+        except AssertionError as e:
+            print('Shape of the transition probabilities tensor must be ({}, {}, {})!'.\
+                    format(n_actions, n_states, n_states))
+            raise e
+
+        try:
+            assert R.shape == (n_states, n_actions)
+        except AssertionError as e:
+            print('Shape of the reward matrix must be ({}, {})!'.format(n_states, n_actions))
+            raise e
+        # error checking end *******************************************************
 
         super().__init__()
 
@@ -49,7 +83,13 @@ class MDP(mdp.MDPSpec):
 
 class RestaurantMDP(MDP):
     def __init__(self, epsilon: float):
-        assert 0 <= epsilon <= 1
+
+        # error checking
+        try:
+            assert 0 <= epsilon <= 1
+        except AssertionError as e:
+            print('Epsilon parameter in the restaurant example must be in range [0, 1]!')
+            raise e
 
         P = np.array([
                 [[epsilon, 1 - epsilon],
@@ -66,6 +106,13 @@ class RestaurantMDP(MDP):
 
         self.epsilon = epsilon
 
+        # GR - Good Restaurant
+        # BR - Bad Restaurant
+        self.states[0].name = 'There_is_no_wait_in_GR'
+        self.states[1].name = 'There_is_a_wait_in_GR'
+        self.actions[0].name = 'Send_user_to_GR'
+        self.actions[1].name = 'Send_user_to_BR'
+
     def __repr__(self):
         return 'RestaurantMDP(states=%s, actions=%s, state_outcomes=%s, reward_outcomes=%s)' % \
                 (self.states, self.actions, dict(self.state_outcomes), dict(self.reward_outcomes))
@@ -74,10 +121,33 @@ class RestaurantMDP(MDP):
 class RandomMDP(MDP):
     def __init__(self, n_states: int, n_actions: int, controlled: bool, rank1pages: bool,
             P_distribution: Distribution, R_distribution: Distribution):
-        assert isinstance(controlled, bool)
-        assert isinstance(rank1pages, bool)
-        assert isinstance(P_distribution, Distribution)
-        assert isinstance(R_distribution, Distribution)
+
+        # error checking ***********************************************************
+        try:
+            assert isinstance(controlled, bool)
+        except AssertionError as e:
+            print('Value of \"controlled\" parameter must be of type boolean!')
+            raise e
+
+        try:
+            assert isinstance(rank1pages, bool)
+        except AssertionError as e:
+            print('Value of \"rank1pages\" parameter must be of type boolean!')
+            raise e
+
+        try:
+            assert isinstance(P_distribution, Distribution)
+        except AssertionError as e:
+            print('Transition probabilities distribution must be of type {}!'.\
+                    format(Distribution))
+            raise e
+
+        try:
+            assert isinstance(R_distribution, Distribution)
+        except AssertionError as e:
+            print('Reward distribution must be of type {}!'.format(Distribution))
+            raise e
+        # error checking end *******************************************************
 
         R = R_distribution.sample(size=(n_states, n_actions))
 
@@ -123,3 +193,57 @@ class RandomMDP(MDP):
     def __repr__(self):
         return 'RandomMDP(states=%s, actions=%s, state_outcomes=%s, reward_outcomes=%s)' % \
                 (self.states, self.actions, dict(self.state_outcomes), dict(self.reward_outcomes))
+
+
+class BrokerMDP(MDP):
+    def __init__(self, n_suppliers: int, n_prices: int, epsilon: float):
+
+        # error checking ***********************************************************
+        try:
+            assert n_suppliers > 1
+        except AssertionError as e:
+            print('You failed to provide the number of suppliers > 1!')
+            raise e
+
+        try:
+            assert n_prices > 1
+        except AssertionError as e:
+            print('You failed to provide the number of price categories > 1!')
+            raise e
+
+        try:
+            assert 0 <= epsilon < 1
+        except AssertionError as e:
+            print('Epsilon parameter in the broker example must be in range [0, 1)!')
+            raise e
+        # error checking end *******************************************************
+
+        broker_base = _BrokerBase(n_suppliers, n_prices, epsilon)
+
+        super().__init__(n_states=broker_base.n_states, n_actions=n_suppliers, P=broker_base.P,
+                R=broker_base.R)
+
+        self.n_suppliers = n_suppliers
+        self.n_prices = n_prices
+        self.epsilon = epsilon
+        self.broker_base = broker_base
+
+
+class ToyBrokerMDP(MDP):
+    def __init__(self, controlled: bool):
+
+        # error checking ***********************************************************
+        try:
+            assert isinstance(controlled, bool)
+        except AssertionError as e:
+            print('Value of \"controlled\" parameter must be of type boolean!')
+            raise e
+
+        broker_base = _BrokerBase(n_suppliers=2, n_prices=2, toy=True, toy_controlled=controlled)
+
+        super().__init__(n_states=broker_base.n_states, n_actions=2, P=broker_base.P, R=broker_base.R)
+
+        self.n_suppliers = 2
+        self.n_prices = 2
+        self.controlled = controlled
+        self.broker_base = broker_base

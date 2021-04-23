@@ -1,7 +1,7 @@
 import numpy as np
 
 from src.distribution import Distribution
-from src.mdp import RestaurantMDP, RandomMDP
+from src.mdp import RestaurantMDP, RandomMDP, BrokerMDP, ToyBrokerMDP
 from src.rl_algorithms.qlearning import Qlearner
 from src.rl_algorithms.rlapse import RLAPSE
 from src.infhmdp_utils import ValueIteration, expected_reward
@@ -17,6 +17,12 @@ RANK1PAGES = False
 
 np.random.seed(seed=SEED)
 
+mdp = ToyBrokerMDP(controlled=True)
+mdp.validate()
+print(mdp.R)
+print(mdp.P)
+exit()
+
 P_distribution = Distribution(np.random.gamma, shape=1.0, scale=5.0)
 R_distribution = Distribution(np.random.gamma, shape=0.1, scale=5.0)
 mdp = RandomMDP(
@@ -26,12 +32,14 @@ mdp = RandomMDP(
         rank1pages=RANK1PAGES,
         P_distribution=P_distribution,
         R_distribution=R_distribution)
-print(mdp.R)
-print(mdp.P)
-exit()
+mdp.validate()
+# print(mdp.R)
+# print(mdp.P)
 
 mdp = RestaurantMDP(epsilon=0.2)
 mdp.validate()
+print(mdp)
+exit()
 
 env = mdp.to_env()
 env.reset()
