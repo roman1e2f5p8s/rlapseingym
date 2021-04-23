@@ -17,10 +17,10 @@ Contact: anon.email@domain.com
 import numpy as np
 from blackhc import mdp
 
-from .base_rl import BaseRL
+from rlapse.algorithms._base_alg import BaseRLalg
 
 
-class Qlearner(BaseRL):
+class Qlearner(BaseRLalg):
     '''
     A class for the Q-learning algorithm
     Required arguments:

@@ -27,7 +27,7 @@ def greedy_policy(R):
     return np.array([R[s].argmax() for s in range(S)], dtype=int).T
 
 
-def induced_R(R, policy):
+def _induced_R(R, policy):
     '''
     Computes the induced reward vector for a given reward distribution R and policy
     Parameters:
@@ -39,7 +39,7 @@ def induced_R(R, policy):
     return np.array([R[s][policy[s]] for s in range(R.shape[0])])
 
 
-def induced_MC(P, policy):
+def _induced_MC(P, policy):
     '''
     Computes the induced Markov chain for a given tensor of transition probabilities P and policy
     Parameters:
@@ -51,7 +51,7 @@ def induced_MC(P, policy):
     return np.array([P[policy[s]][s] for s in range(len(policy))])
 
 
-def perron_vec(mc):
+def _perron_vec(mc):
     '''
     Computes the Perron vector of Markov chain mc
     Parameters:
@@ -77,7 +77,7 @@ def expected_reward(R, P, policy):
     Returns:
         - expected reward, float
     '''
-    return float(np.inner(perron_vec(induced_MC(P, policy)), induced_R(R, policy)))
+    return float(np.inner(_perron_vec(_induced_MC(P, policy)), _induced_R(R, policy)))
 
 
 class ValueIteration:

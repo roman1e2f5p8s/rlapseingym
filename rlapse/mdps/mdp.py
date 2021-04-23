@@ -1,8 +1,8 @@
 import numpy as np
 from blackhc import mdp
 
-from .distribution import Distribution
-from ._broker_base import _BrokerBase
+from rlapse.utils.distribution import Distribution
+from rlapse.mdps._broker_base import _BrokerBase
 
 
 class MDP(mdp.MDPSpec):

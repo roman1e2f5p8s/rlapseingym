@@ -12,12 +12,12 @@ import numpy as np
 from blackhc import mdp
 from copy import deepcopy
 
-from .base_rl import BaseRL
-from . import qlearning
-from ..lr_test import lrtest as lr
+from rlapse.algorithms._base_alg import BaseRLalg
+from rlapse.algorithms.qlearning import Qlearner
+from rlapse.utils._lrtest import *
 
 
-class RLAPSE(BaseRL):
+class RLAPSE(BaseRLalg):
     '''
     A class for the VSRL algorithm
     Required arguments:
@@ -36,14 +36,14 @@ class RLAPSE(BaseRL):
         - start_with_complicated -- start the orchestrator with more complicated algorithm, i.e mdp_alg
             (defaults to False)
     '''
-    def __init__(self, env: mdp.MDPEnv, a0: qlearning.Qlearner, a1: qlearning.Qlearner,
+    def __init__(self, env: mdp.MDPEnv, a0: Qlearner, a1: Qlearner,
             significance_level: float = 0.01, t_start: int = 100):
         '''
         Initialization
         '''
         assert isinstance(env, mdp.MDPEnv)
-        assert isinstance(a0, qlearning.Qlearner)
-        assert isinstance(a1, qlearning.Qlearner)
+        assert isinstance(a0, Qlearner)
+        assert isinstance(a1, Qlearner)
         assert 0.0 < significance_level <= 1.0
         assert t_start >= 1
 
@@ -103,8 +103,8 @@ class RLAPSE(BaseRL):
         self.a1._update_params(t, state_index, action_index, next_state_index, reward)
 
         if t + 1 > self.t_start:  # turn the orchestrator on after <self.t_start> time steps
-            L = -2.0 * (lr.ln_l0(self.m, self.n_prime) - lr.ln_l1(self.m, self.n))
-            FL = lr.cdf(L, self.freedom_degrees)
+            L = -2.0 * (ln_l0(self.m, self.n_prime) - ln_l1(self.m, self.n))
+            FL = cdf(L, self.freedom_degrees)
 
             self.use_a1 = True if (FL >= 1 - self.significance_level) else False
 
