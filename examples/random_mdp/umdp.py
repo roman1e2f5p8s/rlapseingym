@@ -22,12 +22,12 @@ T_START = S * S * A
 P_distribution = Distribution(np.random.gamma, shape=1.0, scale=5.0)
 R_distribution = Distribution(np.random.gamma, shape=0.1, scale=5.0)
 
-# generate a random uncontrolled MDP with rank-1 pages, i.e. CMAB, and validate it
+# generate a random uncontrolled MDP with no rank-1 pages, and validate it
 mdp = RandomMDP(
         n_states=S,
         n_actions=A,
         controlled=False,
-        rank1pages=True,
+        rank1pages=False,
         P_distribution=P_distribution,
         R_distribution=R_distribution)
 mdp.validate()

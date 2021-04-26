@@ -13,7 +13,7 @@ np.random.seed(seed=SEED)
 
 # number of states, actions, and time steps
 # choose larger T if Qlearner with gamma=0.9 did not converge
-S, A, T = 10, 3, 500
+S, A, T = 10, 3, 2000
 
 # time step at which to start the orchestrator
 T_START = S * S * A
@@ -22,11 +22,11 @@ T_START = S * S * A
 P_distribution = Distribution(np.random.gamma, shape=1.0, scale=5.0)
 R_distribution = Distribution(np.random.gamma, shape=0.1, scale=5.0)
 
-# generate a random uncontrolled MDP with rank-1 pages, i.e. CMAB, and validate it
+# generate a random controlled MDP with rank-1 pages, and validate it
 mdp = RandomMDP(
         n_states=S,
         n_actions=A,
-        controlled=False,
+        controlled=True,
         rank1pages=True,
         P_distribution=P_distribution,
         R_distribution=R_distribution)
