@@ -25,7 +25,8 @@ DISTRIBUTIONS_0PARG = [
 DISTRIBUTIONS_1PARG = [
         'chisquare',
         'dirichlet',
-        'f',
+        'gamma',
+        'geometric',
         'logseries',
         'pareto',
         'power',
@@ -39,8 +40,7 @@ DISTRIBUTIONS_1PARG = [
 DISTRIBUTIONS_2PARGS = [
         'beta',
         'binomial',
-        'gamma',
-        'geometric',
+        'f',
         'multinomial',
         'multivariate_normal',
         'negative_binomial',
@@ -93,13 +93,13 @@ class Distribution(object):
                 raise e
         elif name in DISTRIBUTIONS_2PARGS:
             try:
-                assert len(args) == 0
+                assert len(args) == 2
             except AssertionError as e:
                 print('Please provide two positional arguments to {} distribution!'.format(name))
                 raise e
         else:
             try:
-                assert len(args) == 0
+                assert len(args) == 3
             except AssertionError as e:
                 print('Please provide three positional arguments to {} distribution!'.format(name))
                 raise e

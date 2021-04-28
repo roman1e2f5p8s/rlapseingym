@@ -22,14 +22,14 @@ def ln_l0(m, n_prime):
         - lnl0 -- logarithm of the maximum likelihood l0, float
     '''
 
-    S, A = m.shape[1], m.shape[0]  # number of states and actions
+    A, S, _ = m.shape  # number of actions and states
 
     lnl0 = - np.log(S)
     for r in range(S):
         for c in range(S):
             m_prime = 0
             for a in range(A):
-                m_prime += m[a][r][c]
+                m_prime += m[a, r, c]
             if n_prime[r] > 0 and m_prime > 0:
                 lnl0 += m_prime * (np.log(m_prime) - np.log(n_prime[r]))
 
@@ -45,14 +45,14 @@ def ln_l1(m, n):
     Returns:
         - lnl1 -- logarithm of the maximum likelihood l1, float
     '''
-    S, A = n.shape  # number of states and actions
+    S, A = n.shape # number of states and actions
 
     lnl1 = - np.log(S)
     for a in range(A):
         for r in range(S):
             for c in range(S):
-                if n[r][a] > 0 and m[a][r][c] > 0:
-                    lnl1 += m[a][r][c] * (np.log(m[a][r][c]) - np.log(n[r][a]))
+                if n[r, a] > 0 and m[a, r, c] > 0:
+                    lnl1 += m[a, r, c] * (np.log(m[a, r, c]) - np.log(n[r, a]))
 
     return lnl1
 
