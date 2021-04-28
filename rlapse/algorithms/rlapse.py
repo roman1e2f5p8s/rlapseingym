@@ -24,8 +24,8 @@ class RLAPSE(BaseRLalg):
         - S -- number of states, int
         - A -- number of actions, int
         - T -- number of time steps, int
-        - cmab_alg -- an object of the LinUCB or Qlearner (myopic) class, algorithm \A_0
-        - mdp_alg -- an object of the Qlearner (hyperopic) class, algorithm \A_1
+        - cmab_alg -- an object of the LinUCB or Qlearner (myopic) class, algorithm A_0
+        - mdp_alg -- an object of the Qlearner (hyperopic) class, algorithm A_1
     Optional arguments:
         - significance_level -- level of significance, float, 0 <= significance_level <= 1
             (default is 0.01)
