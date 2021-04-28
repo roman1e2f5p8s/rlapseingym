@@ -29,7 +29,11 @@ setup(
 
         packages=['rlapse', 'rlapse.mdps', 'rlapse.algorithms', 'rlapse.utils'],
 
-        # license='',
+        license='none',
 
         keywords='reinforcement learning, decision making, machine learning, Markov decision processes',
+
+        tests_require=['pytest'],
+
+        setup_requires=['pytest-runner'],
 )
