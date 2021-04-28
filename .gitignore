@@ -1,1 +1,14 @@
 .venv/
+.eggs/
+.ipynb_checkpoints/
+.pytest_cache/
+rlapse.egg-info/
+__pycache__/
+dist/
+build/
+old/
+tests/__pycache__
+rlapse/__pycache__/
+rlapse/mdps/__pycache__/
+rlapse/utils/__pycache__/
+rlapse/algorithms/__pycache__/
