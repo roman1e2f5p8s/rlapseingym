@@ -320,7 +320,7 @@ class _BrokerBase(object):
 
         for a in range(self.n_suppliers):
             for s in range(self.n_states):
-                assert np.isclose(np.sum(self.P[a, s]) - 1.0, 0.0)
+                assert np.isclose(np.sum(self.P[a, s]), 1)
         if verbose:
             print('Success! All the stochastic rows sum up to 1.')
 

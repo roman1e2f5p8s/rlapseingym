@@ -14,6 +14,7 @@ def test_mdp():
     mdp = MDP(n_states=n_states, n_actions=n_actions, P=P, R=R)
     mdp.validate()
     env = mdp.to_env()
+    env.render()
 
 
 def test_restaurant_mdp():
@@ -23,6 +24,7 @@ def test_restaurant_mdp():
     mdp = RestaurantMDP(epsilon=0.5)
     mdp.validate()
     env = mdp.to_env()
+    env.render()
 
 
 def test_random_mdp():
@@ -31,6 +33,22 @@ def test_random_mdp():
     '''
     P_distribution = Distribution(np.random.uniform, low=0.0, high=1.0)
     R_distribution = Distribution(np.random.normal, loc=0.0, scale=0.1)
+
+    mdp = RandomMDP(n_states=10, n_actions=3, controlled=False, rank1pages=True,
+            P_distribution=P_distribution, R_distribution=R_distribution)
+    mdp.validate()
+    env = mdp.to_env()
+
+    mdp = RandomMDP(n_states=10, n_actions=3, controlled=False, rank1pages=False,
+            P_distribution=P_distribution, R_distribution=R_distribution)
+    mdp.validate()
+    env = mdp.to_env()
+
+    mdp = RandomMDP(n_states=10, n_actions=3, controlled=True, rank1pages=True,
+            P_distribution=P_distribution, R_distribution=R_distribution)
+    mdp.validate()
+    env = mdp.to_env()
+
     mdp = RandomMDP(n_states=10, n_actions=3, controlled=True, rank1pages=False,
             P_distribution=P_distribution, R_distribution=R_distribution)
     mdp.validate()
@@ -54,3 +72,8 @@ def test_toy_broker_mdp():
     mdp = ToyBrokerMDP(controlled=True)
     mdp.validate()
     env = mdp.to_env()
+
+    mdp = ToyBrokerMDP(controlled=False)
+    mdp.validate()
+    env = mdp.to_env()
+    env.render()

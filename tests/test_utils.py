@@ -7,6 +7,9 @@ from rlapse.utils._lrtest import *
 
 
 def _mdps_gen(d: Distribution):
+    '''
+    Generates random MDPs of the four different types for a given distribution
+    '''
     # number of states and number of actions
     S, A = 5, 3
 

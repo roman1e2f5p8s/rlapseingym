@@ -61,9 +61,11 @@ def _perron_vec(mc):
     '''
     eig_val, eig_vec = np.linalg.eig(mc.T)
     perron_root_index = eig_val.argmax()
-    if not np.isclose(eig_val[perron_root_index], 1):
-        print('Perron root != 1 !!!:', max(eig_val))
-        exit()
+    try:
+        assert np.isclose(eig_val[perron_root_index], 1)
+    except AssertionError:
+        raise ValueError('Maximum eigenvalue is not equal to 1!')
+
     return eig_vec[:, perron_root_index] / sum(eig_vec[:, perron_root_index])
 
 

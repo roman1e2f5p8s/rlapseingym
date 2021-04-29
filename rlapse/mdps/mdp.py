@@ -3,7 +3,6 @@ from blackhc import mdp
 
 from rlapse.utils.distribution import Distribution
 from rlapse.mdps._broker_base import _BrokerBase
-from utils.exceptions import *
 
 
 class MDP(mdp.MDPSpec):
@@ -13,12 +12,12 @@ class MDP(mdp.MDPSpec):
         try:
             assert n_states > 1
         except AssertionError:
-            raise LessThanTwo('You failed to provide the number of states > 1!')
+            raise ValueError('You failed to provide the number of states > 1!')
 
         try:
             assert n_actions > 1
         except AssertionError:
-            raise LessThanTwo('You failed to provide the number of actions > 1!')
+            raise ValueError('You failed to provide the number of actions > 1!')
 
         try:
             assert isinstance(P, np.ndarray)
@@ -33,18 +32,18 @@ class MDP(mdp.MDPSpec):
         try:
             assert np.isclose(P.sum(axis=2).all(), 1)
         except AssertionError:
-            raise NotRowStochastic('Sum of the rows in P is not eqaul to 1!')
+            raise ValueError('Sum of the rows in P is not eqaul to 1!')
 
         try:
             assert P.shape == (n_actions, n_states, n_states)
         except AssertionError:
-            raise BadArrayShape('Shape of the transition probabilities tensor must be ({}, {}, {})!'.\
+            raise ValueError('Shape of the transition probabilities tensor must be ({}, {}, {})!'.\
                     format(n_actions, n_states, n_states))
 
         try:
             assert R.shape == (n_states, n_actions)
         except AssertionError:
-            raise BadArrayShape('Shape of the reward matrix must be ({}, {})!'.\
+            raise ValueError('Shape of the reward matrix must be ({}, {})!'.\
                     format(n_states, n_actions))
         # error checking end *******************************************************
 
@@ -89,12 +88,12 @@ class RestaurantMDP(MDP):
         try:
             assert epsilon >= 0
         except AssertionError:
-            raise NotProbabilityN('Epsilon parameter in the restaurant example cannot be < 0!')
+            raise ValueError('Epsilon parameter in the restaurant example cannot be < 0!')
 
         try:
             assert epsilon <= 1
         except AssertionError:
-            raise NotProbabilityP('Epsilon parameter in the restaurant example cannot be > 1!')
+            raise ValueError('Epsilon parameter in the restaurant example cannot be > 1!')
         # error checking end *******************************************************
 
         P = np.array([
@@ -156,7 +155,6 @@ class RandomMDP(MDP):
             R = R.mean(axis=-1)
 
         P = np.zeros(shape=(n_actions, n_states, n_states), dtype=float)
-        print(P_distribution.name)
         if controlled:
             if rank1pages:
                 prob_distr_repr = 'p(s\'|s,a) = mu(s\'|a)'
@@ -169,21 +167,21 @@ class RandomMDP(MDP):
                     try:
                         assert p.all() >= 0
                     except AssertionError:
-                        raise NotProbabilityN(
+                        raise ValueError(
                                 'Negative values for probabilities have been generated! ' + 
                                 'Please use different parameters or another distribution.')
 
                     try:
                         assert p.all() <= 1
                     except AssertionError:
-                        raise NotProbabilityP(
+                        raise ValueError(
                                 'Values > 1 for probabilities have been generated! ' + 
                                 'Please use different parameters or another distribution.')
 
                     try:
                         assert np.isclose(p.sum(), 1)
                     except AssertionError:
-                        raise NotRowStochastic(
+                        raise ValueError(
                                 'Non-stochastic row has been generated! ' + 
                                 'Please use different parameters or another distribution.')
 
@@ -201,21 +199,21 @@ class RandomMDP(MDP):
                         try:
                             assert p.all() >= 0
                         except AssertionError:
-                            raise NotProbabilityN(
+                            raise ValueError(
                                     'Negative values for probabilities have been generated! ' + 
                                     'Please use different parameters or another distribution.')
 
                         try:
                             assert p.all() <= 1
                         except AssertionError:
-                            raise NotProbabilityP(
+                            raise ValueError(
                                     'Values > 1 for probabilities have been generated! ' + 
                                     'Please use different parameters or another distribution.')
 
                         try:
                             assert np.isclose(p.sum(), 1)
                         except AssertionError:
-                            raise NotRowStochastic(
+                            raise ValueError(
                                     'Non-stochastic row has been generated! ' + 
                                     'Please use different parameters or another distribution.')
 
@@ -231,21 +229,21 @@ class RandomMDP(MDP):
                 try:
                     assert p.all() >= 0
                 except AssertionError:
-                    raise NotProbabilityN(
+                    raise ValueError(
                             'Negative values for probabilities have been generated! ' + 
                             'Please use different parameters or another distribution.')
 
                 try:
                     assert p.all() <= 1
                 except AssertionError:
-                    raise NotProbabilityP(
+                    raise ValueError(
                             'Values > 1 for probabilities have been generated! ' + 
                             'Please use different parameters or another distribution.')
 
                 try:
                     assert np.isclose(p.sum(), 1)
                 except AssertionError:
-                    raise NotRowStochastic(
+                    raise ValueError(
                             'Non-stochastic row has been generated! ' + 
                             'Please use different parameters or another distribution.')
 
@@ -263,21 +261,21 @@ class RandomMDP(MDP):
                     try:
                         assert p.all() >= 0
                     except AssertionError:
-                        raise NotProbabilityN(
+                        raise ValueError(
                                 'Negative values for probabilities have been generated! ' + 
                                 'Please use different parameters or another distribution.')
 
                     try:
                         assert p.all() <= 1
                     except AssertionError:
-                        raise NotProbabilityP(
+                        raise ValueError(
                                 'Values > 1 for probabilities have been generated! ' + 
                                 'Please use different parameters or another distribution.')
 
                     try:
                         assert np.isclose(p.sum(), 1)
                     except AssertionError:
-                        raise NotRowStochastic(
+                        raise ValueError(
                                 'Non-stochastic row has been generated! ' + 
                                 'Please use different parameters or another distribution.')
 
@@ -304,22 +302,22 @@ class BrokerMDP(MDP):
         try:
             assert n_suppliers > 1
         except AssertionError:
-            raise LessThanTwo('You failed to provide the number of suppliers > 1!')
+            raise ValueError('You failed to provide the number of suppliers > 1!')
 
         try:
             assert n_prices > 1
         except AssertionError:
-            raise LessThanTwo('You failed to provide the number of price categories > 1!')
+            raise ValueError('You failed to provide the number of price categories > 1!')
 
         try:
             assert epsilon >= 0
         except AssertionError:
-            raise NotProbabilityN('Epsilon parameter in the broker example cannot be < 0!')
+            raise ValueError('Epsilon parameter in the broker example cannot be < 0!')
 
         try:
             assert epsilon <= 1
         except AssertionError:
-            raise NotProbabilityP('Epsilon parameter in the broker example cannot be > 1!')
+            raise ValueError('Epsilon parameter in the broker example cannot be > 1!')
         # error checking end *******************************************************
 
         broker_base = _BrokerBase(n_suppliers, n_prices, epsilon)
