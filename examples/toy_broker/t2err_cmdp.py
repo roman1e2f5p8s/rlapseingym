@@ -11,8 +11,6 @@ np.random.seed(seed=SEED)
 
 # choose larger T if Qlearner with gamma=0.9 did not converge
 T = 700
-N_SUPPLIERS = 2
-N_PRICES = 2
 N_RUNS = 10
 
 t2err = np.empty(shape=(N_RUNS, T))

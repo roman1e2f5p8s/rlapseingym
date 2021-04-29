@@ -1,54 +1,114 @@
 import numpy as np
 
 from rlapse.utils.distribution import *
+from rlapse.mdps.mdp import RandomMDP
 from rlapse.utils.infhmdp import greedy_policy, expected_reward, ValueIteration
 from rlapse.utils._lrtest import *
+
+
+def _mdps_gen(d: Distribution):
+    # number of states and number of actions
+    S, A = 5, 3
+
+    # p(s'|s,a) = mu(s')
+    mdp = RandomMDP(
+            n_states=S,
+            n_actions=A,
+            controlled=False,
+            rank1pages=True,
+            P_distribution=d,
+            R_distribution=d,
+            )
+    mdp.validate()
+
+    # p(s'|s,a) = mu(s'|s)
+    mdp = RandomMDP(
+            n_states=S,
+            n_actions=A,
+            controlled=False,
+            rank1pages=True,
+            P_distribution=d,
+            R_distribution=d,
+            )
+    mdp.validate()
+
+    # p(s'|s,a) = mu(s'|a)
+    mdp = RandomMDP(
+            n_states=S,
+            n_actions=A,
+            controlled=True,
+            rank1pages=True,
+            P_distribution=d,
+            R_distribution=d,
+            )
+    mdp.validate()
+
+    # p(s'|s,a) = mu(s'|s,a)
+    mdp = RandomMDP(
+            n_states=S,
+            n_actions=A,
+            controlled=True,
+            rank1pages=False,
+            P_distribution=d,
+            R_distribution=d,
+            )
+    mdp.validate()
+
 
 
 def test_distributions_0parg():
     '''
     Test all the numpy distributions that take no positional arguments
     '''
-    for dist_name in DISTRIBUTIONS_0PARG:
-        np_distribution = getattr(np.random, dist_name)
-        d = Distribution(np_distribution)
-        d.sample(size=10)
+    for dist_name, args in DIST_ARGS_DICT.items():
+        if args['pos'] is None:
+            np_distribution = getattr(np.random, dist_name)
+            d = Distribution(np_distribution)
+            _mdps_gen(d)
 
 
 def test_distributions_1parg():
     '''
     Test all the numpy distributions that take 1 positional argument
     '''
-    for dist_name in DISTRIBUTIONS_1PARG:
-        np_distribution = getattr(np.random, dist_name)
-        if not dist_name == 'zipf':
-            d = Distribution(np_distribution, [0.5])
-        else:
-            d = Distribution(np_distribution, [1.5])
-        d.sample(size=10)
+    for dist_name, args in DIST_ARGS_DICT.items():
+        if len(args['pos']) == 1:
+            np_distribution = getattr(np.random, dist_name)
+            if dist_name == 'zipf' or dist_name == 'dirichlet':
+                d = Distribution(np_distribution, [1.5])
+            else:
+                d = Distribution(np_distribution, 0.5)
+            _mdps_gen(d)
 
 
 def test_distributions_2pargs():
     '''
     Test all the numpy distributions that take 2 positional arguments
     '''
-    for dist_name in DISTRIBUTIONS_2PARGS:
-        np_distribution = getattr(np.random, dist_name)
-        if not dist_name == 'multivariate_normal':
-            d = Distribution(np_distribution, 1, [1])
-        else:
-            d = Distribution(np_distribution, [0, 1], np.ones(shape=(2, 2)))
-        d.sample(size=10)
+    for dist_name, args in DIST_ARGS_DICT.items():
+        if len(args['pos']) == 2:
+            np_distribution = getattr(np.random, dist_name)
+            if dist_name == 'multivariate_normal':
+                d = Distribution(np_distribution, [0, 1], np.ones(shape=(2, 2)))
+            elif dist_name == 'negative_binomial':
+                d = Distribution(np_distribution, 1, 0.1)
+            else:
+                d = Distribution(np_distribution, 1, [1])
+            _mdps_gen(d)
 
 
 def test_distributions_3pargs():
     '''
     Test all the numpy distributions that take 3 positional arguments
     '''
-    for dist_name in DISTRIBUTIONS_3PARGS:
-        np_distribution = getattr(np.random, dist_name)
-        d = Distribution(np_distribution, 0.5, 1, 1)
-        d.sample(size=10)
+    for dist_name, args in DIST_ARGS_DICT.items():
+        if len(args['pos']) == 3:
+            np_distribution = getattr(np.random, dist_name)
+            if not dist_name == 'hypergeometric':
+                d = Distribution(np_distribution, 0.5, 1, 1)
+            else:
+                d = Distribution(np_distribution, 1, 4, 5)
+            _mdps_gen(d)
 
 
 def test_greedy_policy():

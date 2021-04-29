@@ -1,63 +1,46 @@
 from numpy import random as np_random
 
-# all distributions
-DISTRIBUTIONS_ALL = [l.split()[0] for l in np_random.__doc__.split('\n') \
-        if 'distribution.' in l or 'distribution ' in l]
-
-# See https://numpy.org/doc/1.16/reference/routines.random.html
-# distributions that do not take positional arguments
-DISTRIBUTIONS_0PARG = [
-        'exponential',
-        'gumbel',
-        'laplace',
-        'logistic',
-        'lognormal',
-        'normal',
-        'poisson',
-        'rayleigh',
-        'standard_cauchy',
-        'standard_exponential',
-        'standard_normal',
-        'uniform',
-        ]
-
-# distributions that take one positional argument
-DISTRIBUTIONS_1PARG = [
-        'chisquare',
-        'dirichlet',
-        'gamma',
-        'geometric',
-        'logseries',
-        'pareto',
-        'power',
-        'standard_gamma',
-        'standard_t',
-        'weibull',
-        'zipf',
-        ]
-
-# distributions that take two positional arguments
-DISTRIBUTIONS_2PARGS = [
-        'beta',
-        'binomial',
-        'f',
-        'multinomial',
-        'multivariate_normal',
-        'negative_binomial',
-        'noncentral_chisquare',
-        'vonmises',
-        'wald',
-        ]
-
-# distributions that take tree positional arguments
-DISTRIBUTIONS_3PARGS = [
-        'hypergeometric',
-        'noncentral_f',
-        'triangular',
-        ]
-
-assert sorted(DISTRIBUTIONS_ALL) == sorted(DISTRIBUTIONS_0PARG + DISTRIBUTIONS_1PARG +\
-        DISTRIBUTIONS_2PARGS + DISTRIBUTIONS_3PARGS)
+'''
+pos - positional arguments
+opt - optional arguments (except argument \"size\")
+'''
+DIST_ARGS_DICT = {
+        'beta': {'pos': ['a', 'b'], 'opt': []},
+        'binomial': {'pos': ['n', 'p'], 'opt': []},
+        'chisquare': {'pos': ['df'], 'opt': []},
+        'dirichlet': {'pos': ['alpha'], 'opt': []},
+        'exponential': {'pos': [], 'opt': ['scale']},
+        'f': {'pos': ['dfnum', 'dfden'], 'opt': []},
+        'gamma': {'pos': ['shape'], 'opt': ['scale']},
+        'geometric': {'pos': ['p'], 'opt': []},
+        'gumbel': {'pos': [], 'opt': ['loc', 'scale']},
+        'hypergeometric': {'pos': ['ngood', 'nbad', 'nsample'], 'opt': []},
+        'laplace': {'pos': [], 'opt': ['loc', 'scale']},
+        'logistic': {'pos': [], 'opt': ['loc', 'scale']},
+        'lognormal': {'pos': [], 'opt': ['mean', 'sigma']},
+        'logseries': {'pos': ['p'], 'opt': []}, 
+        'multinomial': {'pos': ['n', 'pvals'], 'opt': []},
+        'multivariate_normal': {'pos': ['mean', 'cov'], 'opt': []},
+        'negative_binomial': {'pos': ['n', 'p'], 'opt': []},
+        'noncentral_chisquare': {'pos': ['df', 'nonc'], 'opt': []},
+        'noncentral_f': {'pos': ['dfnum', 'dfden', 'nonc'], 'opt': []},
+        'normal': {'pos': [], 'opt': ['loc', 'scale']},
+        'pareto': {'pos': ['a'], 'opt': []},
+        'poisson': {'pos': [], 'opt': ['lam']},
+        'power': {'pos': ['a'], 'opt': []},
+        'rayleigh': {'pos': [], 'opt': ['scale']},
+        'standard_cauchy': {'pos': [], 'opt': []},
+        'standard_exponential': {'pos': [], 'opt': []},
+        'standard_gamma': {'pos': ['shape'], 'opt': []},
+        'standard_normal': {'pos': [], 'opt': []},
+        'standard_t': {'pos': ['df'], 'opt': []},
+        'triangular': {'pos': ['left', 'mode', 'right'], 'opt': []},
+        'uniform': {'pos': [], 'opt': ['low', 'high']},
+        'vonmises': {'pos': ['mu', 'kappa'], 'opt': []},
+        'wald': {'pos': ['mean', 'scale'], 'opt': []},
+        'weibull': {'pos': ['a'], 'opt': []},
+        'zipf': {'pos': ['a'], 'opt': []},
+}
 
 
 class Distribution(object):
@@ -66,50 +49,29 @@ class Distribution(object):
         # error checking ***********************************************************
         try:
             name = np_distribution.__name__
-        except AttributeError as e:
-            print('{} is probably not a numpy distribution! See np.random.__doc__ for details.'.\
+        except AttributeError:
+            raise TypeError(
+                    '{} is probably not a numpy distribution! See np.random.__doc__ for details.'.\
                     format(np_distribution))
-            raise e
 
         try:
-            assert hasattr(np_random, name) and name in DISTRIBUTIONS_ALL
-        except AssertionError as e:
-            print('Unknown numpy distribution: {}! See np.random.__doc__ for details.'.\
+            assert hasattr(np_random, name) and name in DIST_ARGS_DICT.keys()
+        except AssertionError:
+            raise NameError('Unknown numpy distribution: {}! See np.random.__doc__ for details.'.\
                     format(np_distribution))
-            raise e
-
-        if name in DISTRIBUTIONS_0PARG:
-            try:
-                assert len(args) == 0
-            except AssertionError as e:
-                print('{} distribution takes no positional arguments! Please use keyword arguments'.\
-                        format(name))
-                raise e
-        elif name in DISTRIBUTIONS_1PARG:
-            try:
-                assert len(args) == 1
-            except AssertionError as e:
-                print('Please provide one positional argument to {} distribution!'.format(name))
-                raise e
-        elif name in DISTRIBUTIONS_2PARGS:
-            try:
-                assert len(args) == 2
-            except AssertionError as e:
-                print('Please provide two positional arguments to {} distribution!'.format(name))
-                raise e
-        else:
-            try:
-                assert len(args) == 3
-            except AssertionError as e:
-                print('Please provide three positional arguments to {} distribution!'.format(name))
-                raise e
 
         try:
             assert 'size' not in kwargs.keys()
-        except AssertionError as e:
-            print('Argument \"size\" must not be provided during the initialization! ' +\
+        except AssertionError:
+            raise KeyError('Argument \"size\" must not be provided during the initialization! ' +\
                     'Specify \"size\" when sampling random numbers.')
-            raise e
+
+        for arg in kwargs.keys():
+            try:
+                assert arg in DIST_ARGS_DICT[name]['pos'] or arg in DIST_ARGS_DICT[name]['opt']
+            except AssertionError:
+                raise KeyError('np.random.{}(...) does not take keyword argument \"{}\"!'.\
+                        format(name, arg))
         # error checking end *******************************************************
 
         self.name = name

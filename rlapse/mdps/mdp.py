@@ -3,6 +3,7 @@ from blackhc import mdp
 
 from rlapse.utils.distribution import Distribution
 from rlapse.mdps._broker_base import _BrokerBase
+from utils.exceptions import *
 
 
 class MDP(mdp.MDPSpec):
@@ -11,40 +12,40 @@ class MDP(mdp.MDPSpec):
         # error checking ***********************************************************
         try:
             assert n_states > 1
-        except AssertionError as e:
-            print('You failed to provide the number of states > 1!')
-            raise e
+        except AssertionError:
+            raise LessThanTwo('You failed to provide the number of states > 1!')
 
         try:
             assert n_actions > 1
-        except AssertionError as e:
-            print('You failed to provide the number of actions > 1!')
-            raise e
+        except AssertionError:
+            raise LessThanTwo('You failed to provide the number of actions > 1!')
 
         try:
             assert isinstance(P, np.ndarray)
-        except AssertionError as e:
-            print('Transition probabilities tensor must be a numpy array!')
-            raise e
+        except AssertionError:
+            raise TypeError('Transition probabilities tensor must be a numpy array!')
 
         try:
             assert isinstance(R, np.ndarray)
-        except AssertionError as e:
-            print('Reward matrix must be a numpy array!')
-            raise e
+        except AssertionError:
+            raise TypeError('Reward matrix must be a numpy array!')
+
+        try:
+            assert np.isclose(P.sum(axis=2).all(), 1)
+        except AssertionError:
+            raise NotRowStochastic('Sum of the rows in P is not eqaul to 1!')
 
         try:
             assert P.shape == (n_actions, n_states, n_states)
-        except AssertionError as e:
-            print('Shape of the transition probabilities tensor must be ({}, {}, {})!'.\
+        except AssertionError:
+            raise BadArrayShape('Shape of the transition probabilities tensor must be ({}, {}, {})!'.\
                     format(n_actions, n_states, n_states))
-            raise e
 
         try:
             assert R.shape == (n_states, n_actions)
-        except AssertionError as e:
-            print('Shape of the reward matrix must be ({}, {})!'.format(n_states, n_actions))
-            raise e
+        except AssertionError:
+            raise BadArrayShape('Shape of the reward matrix must be ({}, {})!'.\
+                    format(n_states, n_actions))
         # error checking end *******************************************************
 
         super().__init__()
@@ -84,12 +85,17 @@ class MDP(mdp.MDPSpec):
 class RestaurantMDP(MDP):
     def __init__(self, epsilon: float):
 
-        # error checking
+        # error checking ***********************************************************
         try:
-            assert 0 <= epsilon <= 1
-        except AssertionError as e:
-            print('Epsilon parameter in the restaurant example must be in range [0, 1]!')
-            raise e
+            assert epsilon >= 0
+        except AssertionError:
+            raise NotProbabilityN('Epsilon parameter in the restaurant example cannot be < 0!')
+
+        try:
+            assert epsilon <= 1
+        except AssertionError:
+            raise NotProbabilityP('Epsilon parameter in the restaurant example cannot be > 1!')
+        # error checking end *******************************************************
 
         P = np.array([
                 [[epsilon, 1 - epsilon],
@@ -125,60 +131,156 @@ class RandomMDP(MDP):
         # error checking ***********************************************************
         try:
             assert isinstance(controlled, bool)
-        except AssertionError as e:
-            print('Value of \"controlled\" parameter must be of type boolean!')
-            raise e
+        except AssertionError:
+            raise TypeError('Value of \"controlled\" parameter must be of type boolean!')
 
         try:
             assert isinstance(rank1pages, bool)
-        except AssertionError as e:
-            print('Value of \"rank1pages\" parameter must be of type boolean!')
-            raise e
+        except AssertionError:
+            raise TypeError('Value of \"rank1pages\" parameter must be of type boolean!')
 
         try:
             assert isinstance(P_distribution, Distribution)
-        except AssertionError as e:
-            print('Transition probabilities distribution must be of type {}!'.\
+        except AssertionError:
+            raise TypeError('Transition probabilities distribution must be of type {}!'.\
                     format(Distribution))
-            raise e
 
         try:
             assert isinstance(R_distribution, Distribution)
-        except AssertionError as e:
-            print('Reward distribution must be of type {}!'.format(Distribution))
-            raise e
+        except AssertionError:
+            raise TypeError('Reward distribution must be of type {}!'.format(Distribution))
         # error checking end *******************************************************
 
-        R = R_distribution.sample(size=(n_states, n_actions))
+        R = R_distribution.sample(size=(n_states, n_actions)).astype(float)
+        if len(R.shape) == 3:
+            R = R.mean(axis=-1)
 
-        P = np.zeros(shape=(n_actions, n_states, n_states))
+        P = np.zeros(shape=(n_actions, n_states, n_states), dtype=float)
+        print(P_distribution.name)
         if controlled:
             if rank1pages:
                 prob_distr_repr = 'p(s\'|s,a) = mu(s\'|a)'
                 for a in range(n_actions):
-                    p = P_distribution.sample(size=n_states)
+                    p = P_distribution.sample(size=n_states).astype(float)
+                    if len(p.shape) == 2:
+                        p = p.mean(axis=-1)
                     p /= np.sum(p)
+
+                    try:
+                        assert p.all() >= 0
+                    except AssertionError:
+                        raise NotProbabilityN(
+                                'Negative values for probabilities have been generated! ' + 
+                                'Please use different parameters or another distribution.')
+
+                    try:
+                        assert p.all() <= 1
+                    except AssertionError:
+                        raise NotProbabilityP(
+                                'Values > 1 for probabilities have been generated! ' + 
+                                'Please use different parameters or another distribution.')
+
+                    try:
+                        assert np.isclose(p.sum(), 1)
+                    except AssertionError:
+                        raise NotRowStochastic(
+                                'Non-stochastic row has been generated! ' + 
+                                'Please use different parameters or another distribution.')
+
                     for s in range(n_states):
                         P[a, :] = p
             else:
                 prob_distr_repr = 'p(s\'|s,a) = mu(s\'|s,a)'
                 for a in range(n_actions):
                     for s in range(n_states):
-                        p = P_distribution.sample(size=n_states)
-                        P[a, s] = p / np.sum(p)
+                        p = P_distribution.sample(size=n_states).astype(float)
+                        if len(p.shape) == 2:
+                            p = p.mean(axis=-1)
+                        p /= np.sum(p)
+
+                        try:
+                            assert p.all() >= 0
+                        except AssertionError:
+                            raise NotProbabilityN(
+                                    'Negative values for probabilities have been generated! ' + 
+                                    'Please use different parameters or another distribution.')
+
+                        try:
+                            assert p.all() <= 1
+                        except AssertionError:
+                            raise NotProbabilityP(
+                                    'Values > 1 for probabilities have been generated! ' + 
+                                    'Please use different parameters or another distribution.')
+
+                        try:
+                            assert np.isclose(p.sum(), 1)
+                        except AssertionError:
+                            raise NotRowStochastic(
+                                    'Non-stochastic row has been generated! ' + 
+                                    'Please use different parameters or another distribution.')
+
+                        P[a, s] = p
         else:
             if rank1pages:
                 prob_distr_repr = 'p(s\'|s,a) = mu(s\')'
-                p = P_distribution.sample(size=n_states)
+                p = P_distribution.sample(size=n_states).astype(float)
+                if len(p.shape) == 2:
+                    p = p.mean(axis=-1)
                 p /= np.sum(p)
+
+                try:
+                    assert p.all() >= 0
+                except AssertionError:
+                    raise NotProbabilityN(
+                            'Negative values for probabilities have been generated! ' + 
+                            'Please use different parameters or another distribution.')
+
+                try:
+                    assert p.all() <= 1
+                except AssertionError:
+                    raise NotProbabilityP(
+                            'Values > 1 for probabilities have been generated! ' + 
+                            'Please use different parameters or another distribution.')
+
+                try:
+                    assert np.isclose(p.sum(), 1)
+                except AssertionError:
+                    raise NotRowStochastic(
+                            'Non-stochastic row has been generated! ' + 
+                            'Please use different parameters or another distribution.')
+
                 for a in range(n_actions):
                     for s in range(n_states):
                         P[a, :] = p
             else:
                 prob_distr_repr = 'p(s\'|s,a) = mu(s\'|s)'
                 for s in range(n_states):
-                    p = P_distribution.sample(size=n_states)
+                    p = P_distribution.sample(size=n_states).astype(float)
+                    if len(p.shape) == 2:
+                        p = p.mean(axis=-1)
                     p /= np.sum(p)
+
+                    try:
+                        assert p.all() >= 0
+                    except AssertionError:
+                        raise NotProbabilityN(
+                                'Negative values for probabilities have been generated! ' + 
+                                'Please use different parameters or another distribution.')
+
+                    try:
+                        assert p.all() <= 1
+                    except AssertionError:
+                        raise NotProbabilityP(
+                                'Values > 1 for probabilities have been generated! ' + 
+                                'Please use different parameters or another distribution.')
+
+                    try:
+                        assert np.isclose(p.sum(), 1)
+                    except AssertionError:
+                        raise NotRowStochastic(
+                                'Non-stochastic row has been generated! ' + 
+                                'Please use different parameters or another distribution.')
+
                     for a in range(n_actions):
                         P[a, s] = p
 
@@ -201,21 +303,23 @@ class BrokerMDP(MDP):
         # error checking ***********************************************************
         try:
             assert n_suppliers > 1
-        except AssertionError as e:
-            print('You failed to provide the number of suppliers > 1!')
-            raise e
+        except AssertionError:
+            raise LessThanTwo('You failed to provide the number of suppliers > 1!')
 
         try:
             assert n_prices > 1
-        except AssertionError as e:
-            print('You failed to provide the number of price categories > 1!')
-            raise e
+        except AssertionError:
+            raise LessThanTwo('You failed to provide the number of price categories > 1!')
 
         try:
-            assert 0 <= epsilon < 1
-        except AssertionError as e:
-            print('Epsilon parameter in the broker example must be in range [0, 1)!')
-            raise e
+            assert epsilon >= 0
+        except AssertionError:
+            raise NotProbabilityN('Epsilon parameter in the broker example cannot be < 0!')
+
+        try:
+            assert epsilon <= 1
+        except AssertionError:
+            raise NotProbabilityP('Epsilon parameter in the broker example cannot be > 1!')
         # error checking end *******************************************************
 
         broker_base = _BrokerBase(n_suppliers, n_prices, epsilon)
@@ -235,9 +339,8 @@ class ToyBrokerMDP(MDP):
         # error checking ***********************************************************
         try:
             assert isinstance(controlled, bool)
-        except AssertionError as e:
-            print('Value of \"controlled\" parameter must be of type boolean!')
-            raise e
+        except AssertionError:
+            raise TypeError('Value of \"controlled\" parameter must be of type boolean!')
 
         broker_base = _BrokerBase(n_suppliers=2, n_prices=2, toy=True, toy_controlled=controlled)
 
