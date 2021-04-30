@@ -70,7 +70,23 @@ The rewards for each state-action pair are
 
 ![equation](https://latex.codecogs.com/svg.latex?R%28s%2Ca%29%3D%5Cbegin%7Bbmatrix%7D%20r_1%20%26%20r_3%20%5C%5C%20r_2%20%26%20r_3%20%5Cend%7Bbmatrix%7D.)
 
-![equation]()
+The analysis provided in 
+[(Epperlein et al. 2021)](https://www.researchgate.net/publication/350087449_Reinforcement_Learning_with_Algorithms_from_Probabilistic_Structure_Estimation)
+can be used to show that for 
+![equation](https://latex.codecogs.com/gif.latex?%5Cepsilon%20%3E%20%5Cfrac%7Br_1%20&plus;%20r_3%20-%202r_2%7D%7B2%28r_1%20-%20r_2%29%7D)
+the myopic policy is optimal, and thus a simple lightweight algorithm would be more suitable for this 
+problem. However, the value of 
+![equation](https://latex.codecogs.com/gif.latex?%5Cepsilon) might be unknown from the outset, and 
+sometimes more complicated algorithms can be required. RLAPSE is a tool which automatically selects 
+the appropriate algorithm given an unknown environment.
+
+**Note:** even though the restaurant example is not practical, this toy example is intended to
+be a good illustration of the problem settings. A more realistic and complicated scenarios is 
+discussed in 
+[(Epperlein et al.
+2021)](https://www.researchgate.net/publication/350087449_Reinforcement_Learning_with_Algorithms_from_Probabilistic_Structure_Estimation).
+
+
 ## Installation
 The `VSRL` project requires Python 3.8.1 or higher. To install requirements:
 ```bash
