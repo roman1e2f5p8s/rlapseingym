@@ -13,32 +13,40 @@ More details about this work can be found in [(Epperlein et al. 2021)](https://w
 ## Motivation
 
 Consider a simple illustrative example for restaurant recommendation.
-We have a good restaurant (GR) with very limited capacity, and a bad restaurant (BR) with near 
+We have a good restaurant (*GR*) with very limited capacity, and a bad restaurant (*BR*) with near 
 infinite capacity. Every time a user asks for a recommendation, we can send them to either of the 
 two restaurants, hence our action space is 
 ![equation](https://latex.codecogs.com/svg.latex?A%20%3D%20%5C%7B1%2C%202%5C%7D), where 
-* Action 1: Send user to GR;
-* Action 2: Send user to BR.
+* Action 1: Send user to *GR*;
+* Action 2: Send user to *BR*.
 
-BR is always able to seat customers, whereas GR might not be able to, hence we need at least two states,
-so the state space is *S = {1, 2}*, where
-* State 1: There is no wait in GR;
-* State 2: There is a wait in GR.
+*BR* is always able to seat customers, whereas *GR* might not be able to, hence we need at least 
+two states, so the state space is 
+![equation](https://latex.codecogs.com/gif.latex?S%20%3D%20%5C%7B1%2C%202%5C%7D), where 
+* State 1: There is no wait in *GR*;
+* State 2: There is a wait in *GR*.
 
-Even when they have to wait, customers still prefer GR. Customers' enjoyment of BR is always the same, 
-since they never have to wait there. So we can say that we have rewards *r1 > r2 > r3*, where
-* r1: reward for sending customer to GR while there is no wait;
-* r2: reward for sending customer to GR even if there is a wait;
-* r3: reward for sending customer to BR.
+Even when they have to wait, customers still prefer *GR*. Customers' enjoyment of *BR* is always 
+the same, since they never have to wait there. So we can say that we have rewards 
+![equation](https://latex.codecogs.com/gif.latex?r_1%20%3E%20r_2%20%3E%20r_3), where
+* ![equation](https://latex.codecogs.com/gif.latex?r_1): 
+reward for sending customer to *GR* while there is no wait;
+* ![equation](https://latex.codecogs.com/gif.latex?r_2): 
+reward for sending customer to *GR* even if there is a wait;
+* ![equation](https://latex.codecogs.com/gif.latex?r_3): 
+reward for sending customer to *BR*.
 
-Sending a customer to GR while it is able to seat will, with high probability, say *1 − 𝜖11*, lead to 
-a crowded GR. If there was a wait already, then sending a customer there will also likely 
-not change that, so say the probability of GR staying crowded is *1 − 𝜖21*.
-Not sending a customer there will likely leave GR without a wait, with probability *1 − 𝜖12*, or lead to 
-GR being able to seat the next customer, with probability *1 − 𝜖22*. For simplicity and illustrative 
-purposes, we assume now that all the small probabilities are equal, i.e.,
-*1 > 𝜖11 = 𝜖12 = 𝜖21 = 𝜖22 = 𝜖 > 0*.
-<img src="https://latex.codecogs.com/svg.latex?\epsilon=0.1" /> 
+Sending a customer to *GR* while it is able to seat will, with high probability, say 
+![equation](https://latex.codecogs.com/gif.latex?1%20-%20%5Cepsilon_%7B11%7D), lead to 
+a crowded *GR*. If there was a wait already, then sending a customer there will also likely 
+not change that, so say the probability of *GR* staying crowded is 
+![equation](https://latex.codecogs.com/gif.latex?1%20-%20%5Cepsilon_%7B21%7D).
+Not sending a customer there will likely leave *GR* without a wait, with probability 
+![equation](https://latex.codecogs.com/gif.latex?1%20-%20%5Cepsilon_%7B12%7D), or lead to 
+*GR* being able to seat the next customer, with probability 
+![equation](https://latex.codecogs.com/gif.latex?1%20-%20%5Cepsilon_%7B22%7D). 
+For simplicity and illustrative purposes, we assume now that all the small probabilities are equal, i.e.,
+![equation](https://latex.codecogs.com/gif.latex?1%20%3E%20%5Cepsilon_%7B11%7D%20%3D%20%5Cepsilon_%7B12%7D%20%3D%20%5Cepsilon_%7B21%7D%20%3D%20%5Cepsilon_%7B22%7D%20%3D%20%5Cepsilon%20%3E%200).
 
 ## Installation
 The `VSRL` project requires Python 3.8.1 or higher. To install requirements:
