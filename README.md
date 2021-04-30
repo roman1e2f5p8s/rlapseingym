@@ -81,28 +81,74 @@ sometimes more complicated algorithms can be required. RLAPSE is a tool which au
 the appropriate algorithm given an unknown environment.
 
 **Note:** even though the restaurant example is not practical, this toy example is intended to
-be a good illustration of the problem settings. A more realistic and complicated scenarios is 
-discussed in 
+be a good illustration of the problem settings. A more realistic and complicated scenarios, the broker
+example, is discussed in 
 [(Epperlein et al.
 2021)](https://www.researchgate.net/publication/350087449_Reinforcement_Learning_with_Algorithms_from_Probabilistic_Structure_Estimation).
 
 ## Getting Started
 Please follow these instructions to install all the requirements and use the package correctly.
 
-### Requirements
-The RLAPSE package requires `Python 3.6`. To install requirements:
-```bash
-pip3.6 install -r requirements.txt
-``` 
-### Installation
+### Requirements and Installation
 ```bash
 git clone https://github.com/roman1e2f5p8s/rlapseingym
+pip3.6 install -r requirements.txt
 python3.6 setup.py install
 ```
+
+You may want to run the tests to make sure the software is fully compatible with your system:
+```bash
+python3.6 setup.py pytest
+```
 ### Usage
+RLAPSE includes three packages:
+* `mdps`: provides wrappers for some MDP examples with ability to convert them into OpenAI environments;
+* `algorithms`: implements reinforcement learning algorithms and the orchestrator;
+* `utils`: includes some utilities to compute properties of infinite horizon MDPs and wrapper for 
+[NumPy distributions](https://numpy.org/doc/1.16/reference/routines.random.html).
+
+#### MDP examples
+The following MDP examples are available in `rlapse.mdps.mdp`:
+* `MDP`: create MDPs from transition probability tensor and reward matrix;
+* `RandomMDP`: generate random MDPs using NumPy distributions.
+* `RestaurantMDP`: create MDPs for the restaurant example;
+* `BrokerMDP`: generate random MDPs for the broker example;
+* `ToyBrokerMDP`: create MDPs for a toy broker example.
+
+```python
+from rlapse.mdps.mdp import RestaurantMDP
+
+mdp = RestaurantMDP(epsilon=0.2)
+mdp.validate()
+```
+
+#### Gym environments
+Generated MDPs can be easily converted to OpenAI Gym environments:
+```python
+env = mdp.to_env()
+```
+
+The environment then can be rendered into Jupyter notebooks:
+```python
+env.render()
+```
+
+<div>
+<img src="examples/restaurant/_render.png" alt="Restaurant example MDP" />
+</div>
+<b>Figure 1: Restaurant example MDP rendered into Jupyter notebook</b>
 
 ## Built With
 * [MDP for OpenAI Gym](https://github.com/BlackHC/mdp)
 
 ## Authors
 * **Roman Overko**
+
+## Contributing
+Pull requests are welcome. For major changes, please open an issue first to discuss what you would 
+like to change.
+
+Please make sure to update tests as appropriate.
+
+## License
+None
