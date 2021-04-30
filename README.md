@@ -122,7 +122,7 @@ mdp = RestaurantMDP(epsilon=0.2)
 mdp.validate()
 ```
 
-#### Gym environments
+##### Gym environments
 Generated MDPs can be easily converted to OpenAI Gym environments:
 ```python
 env = mdp.to_env()
@@ -137,6 +137,61 @@ env.render()
 <img src="examples/restaurant/_render.png" alt="Restaurant example MDP" />
 </div>
 <b>Figure 1: Restaurant example MDP rendered into Jupyter notebook</b>
+
+#### Algorithms
+The package includes implementation of the Q-learning and RLAPSE algorithms:
+```python
+from rlapse.algorithms.qlearning import Qlearner
+from rlapse.algorithms.rlapse import RLAPSE
+
+a0 = Qlearner(env, gamma=0.0)          # Q-learning with discount factor 0.0
+a1 = Qlearner(env, gamma=0.9)          # Q-learning with discount factor 0.9
+rl = RLAPSE(env, a0, a1, t_start=100)  # RLAPSE
+```
+
+To learn a policy from the environment:
+```python
+a0.learn(total_timesteps=T)
+a1.learn(total_timesteps=T)
+rl.learn(total_timesteps=T)
+```
+
+To predict the action for a given observation (i.e., state):
+```python
+for observation in env.mdp.states:
+    action_a0, _ = a0.predict(observation)
+    action_a1, _ = a1.predict(observation)
+    action_rl, _ = rl.predict(observation)
+```
+
+#### Utilities
+Use the value iteration algorithm to compute the optimal policy:
+```python
+from rlapse.utils.infhmdp import ValueIteration, expected_reward
+
+VI = ValueIteration(R=env.mdp.R, P=env.mdp.P)
+OPTIMAL_POLICY = VI.policy
+OPTIMAL_REWARD = expected_reward(R=env.mdp.R, P=env.mdp.P, policy=OPTIMAL_POLICY)
+```
+
+##### Distributions for random MDPs
+Use the `Distribution` wrapper to generate random MDPs:
+```python
+import numpy as np
+from rlapse.utils.distribution import Distribution
+from rlapse.mdps.mdp import RandomMDP
+
+P_distribution = Distribution(np.random.gamma, shape=1.0, scale=5.0)
+R_distribution = Distribution(np.random.gamma, shape=0.1, scale=5.0)
+mdp = RandomMDP(
+        n_states=10, n_actions=3,
+        controlled=False, rank1pages=True,
+        P_distribution=P_distribution,
+        R_distribution=R_distribution)
+mdp.validate()
+```
+
+For more examples, please see the `examples/` folder and `examples.ipynb` notebook.
 
 ## Built With
 * [MDP for OpenAI Gym](https://github.com/BlackHC/mdp)
