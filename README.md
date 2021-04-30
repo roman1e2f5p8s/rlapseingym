@@ -16,7 +16,7 @@ Consider a simple illustrative example for restaurant recommendation.
 We have a good restaurant (GR) with very limited capacity, and a bad restaurant (BR) with near 
 infinite capacity. Every time a user asks for a recommendation, we can send them to either of the 
 two restaurants, hence our action space is 
-<img src="https://latex.codecogs.com/svg.latex?A=\{1, 2\}" />, where 
+![equation](https://latex.codecogs.com/gif.latex?A&space;=&space;\{1,&space;2\}), where 
 * Action 1: Send user to GR;
 * Action 2: Send user to BR.
 
