@@ -48,6 +48,28 @@ Not sending a customer there will likely leave *GR* without a wait, with probabi
 For simplicity and illustrative purposes, we assume now that all the small probabilities are equal, i.e.,
 ![equation](https://latex.codecogs.com/gif.latex?1%20%3E%20%5Cepsilon_%7B11%7D%20%3D%20%5Cepsilon_%7B12%7D%20%3D%20%5Cepsilon_%7B21%7D%20%3D%20%5Cepsilon_%7B22%7D%20%3D%20%5Cepsilon%20%3E%200).
 
+This can be modeled as an MDP with transition probabilities 
+![equation](https://latex.codecogs.com/gif.latex?P) and reward 
+![equation](https://latex.codecogs.com/gif.latex?R). The probabilities to move from state 
+![equation](https://latex.codecogs.com/gif.latex?s) to state 
+![equation](https://latex.codecogs.com/gif.latex?s%27), i.e., 
+![equation](https://latex.codecogs.com/gif.latex?P%28s%27%7Cs%2Ca%29) 
+for each action are encoded in the transition probability matrices:
+* If recommending GR, i.e.,
+![equation](https://latex.codecogs.com/gif.latex?a%20%3D%201), then transition matrix
+
+![equation](https://latex.codecogs.com/gif.latex?P%28%5Ccdot%7C%5Ccdot%2C1%29%3D%5Cbegin%7Bbmatrix%7D%20%5Cepsilon%20%26%201%20-%20%5Cepsilon%20%5C%5C%20%5Cepsilon%20%26%201%20-%20%5Cepsilon%20%5Cend%7Bbmatrix%7D.)
+
+* If recommending BR, i.e.,
+![equation](https://latex.codecogs.com/gif.latex?a%20%3D%202), then transition matrix
+
+![equation](https://latex.codecogs.com/gif.latex?P%28%5Ccdot%7C%5Ccdot%2C1%29%3D%5Cbegin%7Bbmatrix%7D%20%5C1%20-%20epsilon%20%26%20%5Cepsilon%20%5C%5C%20%5C1%20-%20epsilon%20%26%20%5Cepsilon%20%5Cend%7Bbmatrix%7D.)
+
+The rewards for each state-action pair are 
+
+![equation](https://latex.codecogs.com/gif.latex?R%28s%2Ca%29%3D%5Cbegin%7Bbmatrix%7D%20r_1%20%26%20r_3%20%5C%5C%20r_2%20%26%20r_3%20%5Cend%7Bbmatrix%7D.)
+
+![equation]()
 ## Installation
 The `VSRL` project requires Python 3.8.1 or higher. To install requirements:
 ```bash
