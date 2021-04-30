@@ -15,7 +15,8 @@ More details about this work can be found in [(Epperlein et al. 2021)](https://w
 Consider a simple illustrative example for restaurant recommendation.
 We have a good restaurant (GR) with very limited capacity, and a bad restaurant (BR) with near 
 infinite capacity. Every time a user asks for a recommendation, we can send them to either of the 
-two restaurants, hence our action space is *A = {1, 2}*, where
+two restaurants, hence our action space is 
+<img src="https://latex.codecogs.com/svg.latex?$A=\{1, 2\}$"/>, where 
 * Action 1: Send user to GR;
 * Action 2: Send user to BR.
 
