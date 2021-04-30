@@ -1,12 +1,40 @@
 # Reinforcement Learning with Algorithms from Probabilistic Structure Estimation (RLAPSE)
 
+In many reinforcement learning settings, the choice of the underlying algorithm is not obvious.
 The RLAPSE framework provides the choice whether to use a lightweight myopic algorithm (e.g., Q-learning 
 with discount factor 0) or more complicated (e.g., Q-learning with discount 
-factor close to 1) reinforcement learning algorithm. The framework utilizes the likelihood ratio test 
-and Q-learning algorithm (namely, a variant analyzed by 
-[Even-Dar 2003](https://www.jmlr.org/papers/volume5/evendar03a/evendar03a.pdf)) 
-in so-called *orchestrator*. Based on the collected statistics about the environment, 
-RLAPSE switches to a more appropriate algorithm, if deemed necessary.
+factor close to 1) reinforcement learning algorithm. The framework utilizes 
+(i) the likelihood ratio test, and (ii) a variant of Q-learning analyzed by 
+[(Even-Dar et al. 2003)](https://www.jmlr.org/papers/volume5/evendar03a/evendar03a.pdf)). 
+Based on the collected statistics about the environment, the RLAPSE orchestrator switches to a more 
+appropriate algorithm, if deemed necessary. This selection algorithm is called the *orchestrator*.
+More details about this work can be found in [(Epperlein et al. 2021)](https://www.researchgate.net/publication/350087449_Reinforcement_Learning_with_Algorithms_from_Probabilistic_Structure_Estimation).
+
+## Motivation
+
+Consider a simple illustrative example for restaurant recommendation.
+We have a good restaurant (GR) with very limited capacity, and a bad restaurant (BR) with near 
+infinite capacity. Every time a user asks for a recommendation, we can send them to either of the 
+two restaurants, hence our action space is *A = {1, 2}*, where
+* Action 1: Send user to GR;
+* Action 2: Send user to BR.
+
+BR is always able to seat customers, whereas GR might not be able to, hence we need at least two states,
+so the state space is *S = {1, 2}*, where
+* State 1: There is no wait in GR;
+* State 2: There is a wait in GR.
+
+Even when they have to wait, customers still prefer GR. Customers' enjoyment of BR is always the same, 
+since they never have to wait there. So we can say that we have rewards *r1 > r2 > r3*, where
+* r1: reward for sending customer to GR while there is no wait;
+* r2: reward for sending customer to GR even if there is a wait;
+* r3: reward for sending customer to BR.
+
+Sending a customer to GR while it is able to seat will, with high probability, say *1 − 𝜖*, lead to 
+a crowded GR. If there was a wait already, then sending a customer there will also likely 
+not change that, so say the probability of GR staying crowded is *1 − 𝜖*.
+Not sending a customer there will likely leave GR without a wait, with probability *1 −𝜖*, or lead to 
+GR being able to seat the next customer, with probability *1 − 𝜖*.
 
 ## Installation
 The `VSRL` project requires Python 3.8.1 or higher. To install requirements:
