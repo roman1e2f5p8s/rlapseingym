@@ -30,11 +30,16 @@ since they never have to wait there. So we can say that we have rewards *r1 > r2
 * r2: reward for sending customer to GR even if there is a wait;
 * r3: reward for sending customer to BR.
 
-Sending a customer to GR while it is able to seat will, with high probability, say *1 − 𝜖*, lead to 
+Sending a customer to GR while it is able to seat will, with high probability, say *1 − 𝜖11*, lead to 
 a crowded GR. If there was a wait already, then sending a customer there will also likely 
-not change that, so say the probability of GR staying crowded is *1 − 𝜖*.
-Not sending a customer there will likely leave GR without a wait, with probability *1 −𝜖*, or lead to 
-GR being able to seat the next customer, with probability *1 − 𝜖*.
+not change that, so say the probability of GR staying crowded is *1 − 𝜖21*.
+Not sending a customer there will likely leave GR without a wait, with probability *1 − 𝜖12*, or lead to 
+GR being able to seat the next customer, with probability *1 − 𝜖22*. For simplicity and illustrative 
+purposes, we assume now that all the small probabilities are equal, i.e.,
+*1 > 𝜖11 = 𝜖12 = 𝜖21 = 𝜖22 = 𝜖 > 0*.
+```math
+\frac{1}{2}
+```
 
 ## Installation
 The `VSRL` project requires Python 3.8.1 or higher. To install requirements:
