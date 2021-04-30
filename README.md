@@ -22,52 +22,52 @@ two restaurants, hence our action space is
 
 *BR* is always able to seat customers, whereas *GR* might not be able to, hence we need at least 
 two states, so the state space is 
-![equation](https://latex.codecogs.com/gif.latex?S%20%3D%20%5C%7B1%2C%202%5C%7D), where 
+![equation](https://latex.codecogs.com/svg.latex?S%20%3D%20%5C%7B1%2C%202%5C%7D), where 
 * State 1: There is no wait in *GR*;
 * State 2: There is a wait in *GR*.
 
 Even when they have to wait, customers still prefer *GR*. Customers' enjoyment of *BR* is always 
 the same, since they never have to wait there. So we can say that we have rewards 
-![equation](https://latex.codecogs.com/gif.latex?r_1%20%3E%20r_2%20%3E%20r_3), where
-* ![equation](https://latex.codecogs.com/gif.latex?r_1): 
+![equation](https://latex.codecogs.com/svg.latex?r_1%20%3E%20r_2%20%3E%20r_3), where
+* ![equation](https://latex.codecogs.com/svg.latex?r_1): 
 reward for sending customer to *GR* while there is no wait;
-* ![equation](https://latex.codecogs.com/gif.latex?r_2): 
+* ![equation](https://latex.codecogs.com/svg.latex?r_2): 
 reward for sending customer to *GR* even if there is a wait;
-* ![equation](https://latex.codecogs.com/gif.latex?r_3): 
+* ![equation](https://latex.codecogs.com/svg.latex?r_3): 
 reward for sending customer to *BR*.
 
 Sending a customer to *GR* while it is able to seat will, with high probability, say 
-![equation](https://latex.codecogs.com/gif.latex?1%20-%20%5Cepsilon_%7B11%7D), lead to 
+![equation](https://latex.codecogs.com/svg.latex?1%20-%20%5Cepsilon_%7B11%7D), lead to 
 a crowded *GR*. If there was a wait already, then sending a customer there will also likely 
 not change that, so say the probability of *GR* staying crowded is 
-![equation](https://latex.codecogs.com/gif.latex?1%20-%20%5Cepsilon_%7B21%7D).
+![equation](https://latex.codecogs.com/svg.latex?1%20-%20%5Cepsilon_%7B21%7D).
 Not sending a customer there will likely leave *GR* without a wait, with probability 
-![equation](https://latex.codecogs.com/gif.latex?1%20-%20%5Cepsilon_%7B12%7D), or lead to 
+![equation](https://latex.codecogs.com/svg.latex?1%20-%20%5Cepsilon_%7B12%7D), or lead to 
 *GR* being able to seat the next customer, with probability 
-![equation](https://latex.codecogs.com/gif.latex?1%20-%20%5Cepsilon_%7B22%7D). 
+![equation](https://latex.codecogs.com/svg.latex?1%20-%20%5Cepsilon_%7B22%7D). 
 For simplicity and illustrative purposes, we assume now that all the small probabilities are equal, i.e.,
-![equation](https://latex.codecogs.com/gif.latex?1%20%3E%20%5Cepsilon_%7B11%7D%20%3D%20%5Cepsilon_%7B12%7D%20%3D%20%5Cepsilon_%7B21%7D%20%3D%20%5Cepsilon_%7B22%7D%20%3D%20%5Cepsilon%20%3E%200).
+![equation](https://latex.codecogs.com/svg.latex?1%20%3E%20%5Cepsilon_%7B11%7D%20%3D%20%5Cepsilon_%7B12%7D%20%3D%20%5Cepsilon_%7B21%7D%20%3D%20%5Cepsilon_%7B22%7D%20%3D%20%5Cepsilon%20%3E%200).
 
 This can be modeled as an MDP with transition probabilities 
-![equation](https://latex.codecogs.com/gif.latex?P) and reward 
-![equation](https://latex.codecogs.com/gif.latex?R). The probabilities to move from state 
-![equation](https://latex.codecogs.com/gif.latex?s) to state 
-![equation](https://latex.codecogs.com/gif.latex?s%27), i.e., 
-![equation](https://latex.codecogs.com/gif.latex?P%28s%27%7Cs%2Ca%29) 
+![equation](https://latex.codecogs.com/svg.latex?P) and reward 
+![equation](https://latex.codecogs.com/svg.latex?R). The probabilities to move from state 
+![equation](https://latex.codecogs.com/svg.latex?s) to state 
+![equation](https://latex.codecogs.com/svg.latex?s%27), i.e., 
+![equation](https://latex.codecogs.com/svg.latex?P%28s%27%7Cs%2Ca%29) 
 for each action are encoded in the transition probability matrices:
 * If recommending GR, i.e.,
-![equation](https://latex.codecogs.com/gif.latex?a%20%3D%201), then transition matrix
+![equation](https://latex.codecogs.com/svg.latex?a%20%3D%201), then transition matrix
 
-![equation](https://latex.codecogs.com/gif.latex?P%28%5Ccdot%7C%5Ccdot%2C1%29%3D%5Cbegin%7Bbmatrix%7D%20%5Cepsilon%20%26%201%20-%20%5Cepsilon%20%5C%5C%20%5Cepsilon%20%26%201%20-%20%5Cepsilon%20%5Cend%7Bbmatrix%7D.)
+![equation](https://latex.codecogs.com/svg.latex?P%28%5Ccdot%7C%5Ccdot%2C1%29%3D%5Cbegin%7Bbmatrix%7D%20%5Cepsilon%20%26%201%20-%20%5Cepsilon%20%5C%5C%20%5Cepsilon%20%26%201%20-%20%5Cepsilon%20%5Cend%7Bbmatrix%7D.)
 
 * If recommending BR, i.e.,
-![equation](https://latex.codecogs.com/gif.latex?a%20%3D%202), then transition matrix
+![equation](https://latex.codecogs.com/svg.latex?a%20%3D%202), then transition matrix
 
-![equation](https://latex.codecogs.com/gif.latex?R%28s%2Ca%29%3D%5Cbegin%7Bbmatrix%7D%20%5C1%20-%20%5Cepsilon%20%26%20%5Cepsilon%20%5C%5C%20%5C1%20-%20%5Cepsilon%20%26%20%5Cepsilon%20%5Cend%7Bbmatrix%7D.)
+![equation](https://latex.codecogs.com/svg.latex?R%28s%2Ca%29%3D%5Cbegin%7Bbmatrix%7D%20%5C1%20-%20%5Cepsilon%20%26%20%5Cepsilon%20%5C%5C%20%5C1%20-%20%5Cepsilon%20%26%20%5Cepsilon%20%5Cend%7Bbmatrix%7D.))
 
 The rewards for each state-action pair are 
 
-![equation](https://latex.codecogs.com/gif.latex?R%28s%2Ca%29%3D%5Cbegin%7Bbmatrix%7D%20r_1%20%26%20r_3%20%5C%5C%20r_2%20%26%20r_3%20%5Cend%7Bbmatrix%7D.)
+![equation](https://latex.codecogs.com/svg.latex?R%28s%2Ca%29%3D%5Cbegin%7Bbmatrix%7D%20r_1%20%26%20r_3%20%5C%5C%20r_2%20%26%20r_3%20%5Cend%7Bbmatrix%7D.)
 
 ![equation]()
 ## Installation
