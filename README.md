@@ -37,9 +37,7 @@ Not sending a customer there will likely leave GR without a wait, with probabili
 GR being able to seat the next customer, with probability *1 − 𝜖22*. For simplicity and illustrative 
 purposes, we assume now that all the small probabilities are equal, i.e.,
 *1 > 𝜖11 = 𝜖12 = 𝜖21 = 𝜖22 = 𝜖 > 0*.
-```math
-\frac{1}{2}
-```
+<img src="https://latex.codecogs.com/svg.latex?\epsilon=0.1" /> 
 
 ## Installation
 The `VSRL` project requires Python 3.8.1 or higher. To install requirements:
