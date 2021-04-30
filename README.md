@@ -58,20 +58,17 @@ for each action are encoded in the transition probability matrices:
 
 * If recommending GR, i.e.,
 ![equation](https://latex.codecogs.com/svg.latex?a%20%3D%201), then transition matrix
-<p align="center">
+
 ![equation](https://latex.codecogs.com/svg.latex?P%28%5Ccdot%7C%5Ccdot%2C1%29%3D%5Cbegin%7Bbmatrix%7D%20%5Cepsilon%20%26%201%20-%20%5Cepsilon%20%5C%5C%20%5Cepsilon%20%26%201%20-%20%5Cepsilon%20%5Cend%7Bbmatrix%7D.)
-</p>
 
 * If recommending BR, i.e.,
 ![equation](https://latex.codecogs.com/svg.latex?a%20%3D%202), then transition matrix
-<p align="center">
+
 ![equation](https://latex.codecogs.com/svg.latex?R%28s%2Ca%29%3D%5Cbegin%7Bbmatrix%7D%20%5C1%20-%20%5Cepsilon%20%26%20%5Cepsilon%20%5C%5C%20%5C1%20-%20%5Cepsilon%20%26%20%5Cepsilon%20%5Cend%7Bbmatrix%7D.)
-</p>
 
 The rewards for each state-action pair are 
-<p align="center">
+
 ![equation](https://latex.codecogs.com/svg.latex?R%28s%2Ca%29%3D%5Cbegin%7Bbmatrix%7D%20r_1%20%26%20r_3%20%5C%5C%20r_2%20%26%20r_3%20%5Cend%7Bbmatrix%7D.)
-</p>
 
 ![equation]()
 ## Installation
