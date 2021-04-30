@@ -2,9 +2,11 @@
 
 The RLAPSE framework provides the choice whether to use a lightweight myopic algorithm (e.g., Q-learning 
 with discount factor 0) or more complicated (e.g., Q-learning with discount 
-factor close to 1) reinforcement learning (RL) algorithm.
-Based on collected statistics about the environment, the VSRL switches to a more appropriate algorithm, if deemed necessary.
-rithm with (i) likelihood ratio (LR) orchestrator and (ii) myopic Q-learning/LinUCB and hyperopic Q-learning algorithms.
+factor close to 1) reinforcement learning algorithm. The framework utilizes the likelihood ratio test 
+and Q-learning algorithm (namely, a variant analyzed by 
+[Even-Dar 2003](https://www.jmlr.org/papers/volume5/evendar03a/evendar03a.pdf)) 
+in so-called *orchestrator*. Based on the collected statistics about the environment, 
+RLAPSE switches to a more appropriate algorithm, if deemed necessary.
 
 ## Installation
 The `VSRL` project requires Python 3.8.1 or higher. To install requirements:
