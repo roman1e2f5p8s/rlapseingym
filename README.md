@@ -15,7 +15,8 @@ More details about this work can be found in [(Epperlein et al. 2021)](https://w
 Consider a simple illustrative example for restaurant recommendation.
 We have a good restaurant (GR) with very limited capacity, and a bad restaurant (BR) with near 
 infinite capacity. Every time a user asks for a recommendation, we can send them to either of the 
-two restaurants, hence our action space is *A = {1, 2}*, where
+two restaurants, hence our action space is 
+<img src="https://latex.codecogs.com/svg.latex?A=\{1, 2\}" />, where 
 * Action 1: Send user to GR;
 * Action 2: Send user to BR.
 
@@ -37,9 +38,7 @@ Not sending a customer there will likely leave GR without a wait, with probabili
 GR being able to seat the next customer, with probability *1 − 𝜖22*. For simplicity and illustrative 
 purposes, we assume now that all the small probabilities are equal, i.e.,
 *1 > 𝜖11 = 𝜖12 = 𝜖21 = 𝜖22 = 𝜖 > 0*.
-```math
-\frac{1}{2}
-```
+<img src="https://latex.codecogs.com/svg.latex?\epsilon=0.1" /> 
 
 ## Installation
 The `VSRL` project requires Python 3.8.1 or higher. To install requirements:
