@@ -19,11 +19,11 @@ setup(
         version=VERSION,
 
         description='Reinforcement Learning with Algorithms from Probabilistic Structure Estimation '+\
-                '(RLAPSE) for OpenAI Gym',
+                '(RLAPSE)',
 
         author='Roman Overko',
 
-        author_email='roman.overko@ucdconnect.ie',
+        author_email=['roman.1e2f5p8s.over3@gmail.com', 'roman.overko@ucdconnect.ie'],
 
         url='https://github.com/roman1e2f5p8s/rlapseingym',
 
@@ -36,4 +36,21 @@ setup(
         tests_require=['pytest'],
 
         setup_requires=['pytest-runner'],
+
+        classifiers=[
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        'Development Status :: 5 - Production/Stable',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Science/Research',
+        'Topic :: Libraries :: Python Modules',
+
+        # Pick your license as you wish (should match "license" above)
+        # 'License :: OSI Approved :: Apache Software License',
+
+        'Programming Language :: Python :: 3.6',
+    ],
 )
