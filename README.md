@@ -92,7 +92,17 @@ Please follow these instructions to install all the requirements and use the pac
 ### Requirements and Installation
 ```bash
 git clone https://github.com/roman1e2f5p8s/rlapseingym
+```
+If using `pip` use 
+```bash
 pip3.6 install -r requirements.txt
+```
+and for conda use
+```bash
+conda env create -f environment.yml  #  this will create the environment "rlapse"
+```
+to install the dependencies. Then run
+```bash
 python3.6 setup.py install
 ```
 
