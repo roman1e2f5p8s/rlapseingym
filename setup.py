@@ -12,6 +12,7 @@ from version import VERSION
 with open(os.path.join(WORK_DIR, 'README.md'), mode='r', encoding='utf-8') as f:
     LONG_DESCRIPTION = f.read()
 
+
 # This setup is suitable for "python setup.py develop".
 setup(
         name='rlapse',
@@ -32,6 +33,8 @@ setup(
         license='none',
 
         keywords='reinforcement learning, decision making, machine learning, Markov decision processes',
+
+        install_requires='blackhc.mdp @ git+https://github.com/BlackHC/mdp@67f609f2541090d39957853b59d3affe737d183c',
 
         tests_require=['pytest'],
 
