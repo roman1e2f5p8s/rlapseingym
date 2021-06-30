@@ -1,12 +1,15 @@
 import numpy as np
-from blackhc import mdp
+# from blackhc import mdp
+from gym import Env
 from rlapse.algorithms._base_alg import BaseRLalg
 
 
 class MAB_EPS(BaseRLalg):
-    def __init__(self, env: mdp.MDPEnv, epsilon: float = 0.2, epsilon_decay_rate: float = 1.0,
+    # def __init__(self, env: mdp.MDPEnv, epsilon: float = 0.2, epsilon_decay_rate: float = 1.0,
+    def __init__(self, env: Env, epsilon: float = 0.2, epsilon_decay_rate: float = 1.0,
             epsilon_decay_interval: int = 100):
-        assert isinstance(env, mdp.MDPEnv)
+        # assert isinstance(env, mdp.MDPEnv)
+        assert isinstance(env, Env)
         assert 0.0 <= epsilon <= 1.0
         assert 0.0 < epsilon_decay_rate <= 1.0
         assert epsilon_decay_interval >= 1

@@ -14,9 +14,21 @@ class BaseRLalg(object):
     def learn(self, total_timesteps, store_reward=False, store_estimated_reward=False, verbose=False):
         if store_reward:
             self.reward = np_zeros(total_timesteps)
+
         if store_estimated_reward:
-            from rlapse.utils.infhmdp import expected_reward
-            self.estimated_reward = np_zeros(total_timesteps)
+            if hasattr(self.env, 'mdp'):
+                from rlapse.mdps.mdp import MDP
+                if isinstance(self.env.mdp, MDP):
+                    from rlapse.utils.infhmdp import expected_reward
+                    self.estimated_reward = np_zeros(total_timesteps)
+                else:
+                    print('This MDP is not an instanse of \'rlapse.mdps.mdp.MDP\',',
+                            'estimated rewards will not be stored.')
+                    store_estimated_reward = False
+            else:
+                print('This Gym environment has no attribute \'mdp\',',
+                        'estimated rewards will not be stored.')
+                store_estimated_reward = False
 
         state_index = self.env.reset()
         for t in range(total_timesteps):
@@ -28,6 +40,7 @@ class BaseRLalg(object):
 
             if store_reward:
                 self.reward[t] = reward
+
             if store_estimated_reward:
                 self.estimated_reward[t] = expected_reward(self.env.mdp.R, self.env.mdp.P, self.policy)
 

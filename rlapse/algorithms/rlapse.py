@@ -9,7 +9,8 @@ Contact: anon.email@domain.com
 '''
 
 import numpy as np
-from blackhc import mdp
+# from blackhc import mdp
+from gym import Env
 from copy import deepcopy
 
 from rlapse.algorithms._base_alg import BaseRLalg
@@ -36,12 +37,14 @@ class RLAPSE(BaseRLalg):
         - start_with_complicated -- start the orchestrator with more complicated algorithm, i.e mdp_alg
             (defaults to False)
     '''
-    def __init__(self, env: mdp.MDPEnv, a0: Qlearner, a1: Qlearner,
+    # def __init__(self, env: mdp.MDPEnv, a0: Qlearner, a1: Qlearner,
+    def __init__(self, env: Env, a0: Qlearner, a1: Qlearner,
             significance_level: float = 0.01, t_start: int = 100):
         '''
         Initialization
         '''
-        assert isinstance(env, mdp.MDPEnv)
+        # assert isinstance(env, mdp.MDPEnv)
+        assert isinstance(env, Env)
         assert isinstance(a0, Qlearner)
         assert isinstance(a1, Qlearner)
         assert 0.0 < significance_level <= 1.0

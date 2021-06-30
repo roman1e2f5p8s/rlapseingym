@@ -15,7 +15,8 @@ Contact: anon.email@domain.com
 '''
 
 import numpy as np
-from blackhc import mdp
+# from blackhc import mdp
+from gym import Env
 
 from rlapse.algorithms._base_alg import BaseRLalg
 
@@ -33,12 +34,14 @@ class Qlearner(BaseRLalg):
         - epsilon_decay_interval -- interval to decay epsilon , int >= 1 (defaults to 100)
         - omega -- "learning rate", 0.5 < omega < 1 (defaults to 0.7)
     '''
-    def __init__(self, env: mdp.MDPEnv, gamma: float = 0.9, epsilon: float = 0.2,
+    # def __init__(self, env: mdp.MDPEnv, gamma: float = 0.9, epsilon: float = 0.2,
+    def __init__(self, env: Env, gamma: float = 0.9, epsilon: float = 0.2,
             epsilon_decay_rate: float = 1.0, epsilon_decay_interval: int = 100, omega: float = 0.7):
         '''
         Initialization
         '''
-        assert isinstance(env, mdp.MDPEnv)
+        # assert isinstance(env, mdp.MDPEnv)
+        assert isinstance(env, Env)
         assert 0.0 <= gamma <= 1.0
         assert 0.0 <= epsilon <= 1.0
         assert 0.0 < epsilon_decay_rate <= 1.0
