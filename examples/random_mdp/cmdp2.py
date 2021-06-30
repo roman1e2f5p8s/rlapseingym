@@ -55,9 +55,9 @@ a1.learn(total_timesteps=T, store_estimated_reward=True, verbose=True)
 rl.learn(total_timesteps=T, store_estimated_reward=True, verbose=True)
 
 # use the following to predict the action given an observation (i.e. state)
-# for observation in env.mdp.states:
+# for observation in range(env.observation_space.n):
     # action, _ = a1.predict(observation)
-    # print(observation.index, ':', action.index)
+    # print(observation, ':', action)
 
 # use the value iteration algorithm to compute the optimal policy
 VI = ValueIteration(R=env.mdp.R, P=env.mdp.P)

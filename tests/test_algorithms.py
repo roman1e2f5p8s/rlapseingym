@@ -41,7 +41,8 @@ def test_algorithms():
     rl.learn(total_timesteps=T)
     
     # predict the action given an observation (i.e. state)
-    for observation in env.mdp.states:
+    # for observation in env.mdp.states:
+    for observation in range(env.observation_space.n):
         action, _ = a0.predict(observation)
         action, _ = a1.predict(observation)
         action, _ = rl.predict(observation)

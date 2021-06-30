@@ -1,6 +1,7 @@
 import numpy as np
 # from blackhc import mdp
 from gym import Env
+from gym.spaces.discrete import Discrete
 from rlapse.algorithms._base_alg import BaseRLalg
 
 
@@ -10,6 +11,8 @@ class MAB_EPS(BaseRLalg):
             epsilon_decay_interval: int = 100):
         # assert isinstance(env, mdp.MDPEnv)
         assert isinstance(env, Env)
+        assert isinstance(env.action_space, Discrete)
+        assert isinstance(env.observation_space, Discrete)
         assert 0.0 <= epsilon <= 1.0
         assert 0.0 < epsilon_decay_rate <= 1.0
         assert epsilon_decay_interval >= 1

@@ -48,7 +48,14 @@ class BaseRLalg(object):
         if verbose:
             print('{:8s}: {} steps done.'.format(self.__class__.__name__, total_timesteps))
 
+    '''
     def predict(self, observation: mdp.State):
         assert isinstance(observation, mdp.State)
         action = self.env.mdp.actions[self.policy[observation.index]]
+        return action, None
+    '''
+
+    def predict(self, observation: int):
+        assert isinstance(observation, int)
+        action = self.policy[observation]
         return action, None

@@ -11,6 +11,7 @@ Contact: anon.email@domain.com
 import numpy as np
 # from blackhc import mdp
 from gym import Env
+from gym.spaces.discrete import Discrete
 from copy import deepcopy
 
 from rlapse.algorithms._base_alg import BaseRLalg
@@ -45,6 +46,8 @@ class RLAPSE(BaseRLalg):
         '''
         # assert isinstance(env, mdp.MDPEnv)
         assert isinstance(env, Env)
+        assert isinstance(env.action_space, Discrete)
+        assert isinstance(env.observation_space, Discrete)
         assert isinstance(a0, Qlearner)
         assert isinstance(a1, Qlearner)
         assert 0.0 < significance_level <= 1.0
