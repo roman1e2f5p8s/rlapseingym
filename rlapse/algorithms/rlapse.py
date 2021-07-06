@@ -12,6 +12,7 @@ import numpy as np
 # from blackhc import mdp
 from gym import Env
 from gym.spaces.discrete import Discrete
+from gym.spaces.box import Box
 from copy import deepcopy
 
 from rlapse.algorithms._base_alg import BaseRLalg
@@ -46,8 +47,10 @@ class RLAPSE(BaseRLalg):
         '''
         # assert isinstance(env, mdp.MDPEnv)
         assert isinstance(env, Env)
-        assert isinstance(env.action_space, Discrete)
-        assert isinstance(env.observation_space, Discrete)
+        assert isinstance(env.action_space, Discrete) or \
+                (isinstance(env.action_space, Box) and env.action_space.dtype == int)
+        assert isinstance(env.observation_space, Discrete) or \
+                (isinstance(env.observation_space, Box) and env.observation_space.dtype == int)
         assert isinstance(a0, Qlearner)
         assert isinstance(a1, Qlearner)
         assert 0.0 < significance_level <= 1.0
@@ -59,11 +62,21 @@ class RLAPSE(BaseRLalg):
         self.significance_level = significance_level
         self.t_start = t_start
 
-        self.m = np.zeros((env.action_space.n, env.observation_space.n, env.observation_space.n), int)
-        self.n = np.zeros((env.observation_space.n, env.action_space.n), int)
-        self.n_prime = np.zeros(env.observation_space.n, int)
-        self.freedom_degrees = (env.action_space.n - 1) * env.observation_space.n *\
-                (env.observation_space.n - 1)
+        if isinstance(env.observation_space, Discrete):
+            self.n_states = env.observation_space.n
+        else:
+            self.n_states = np.prod(env.observation_space.high.flatten() - \
+                    env.observation_space.low.flatten() + 1) - 1
+        if isinstance(env.action_space, Discrete):
+            self.n_actions = env.action_space.n
+        else:
+            self.n_actions = np.prod(env.action_space.high.flatten() - \
+                    env.action_space.low.flatten() + 1) - 1
+        self.m = np.zeros((self.n_actions, self.n_states, self.n_states), int)
+        self.n = np.zeros((self.n_states, self.n_actions), int)
+        self.n_prime = np.zeros(self.n_states, int)
+        self.freedom_degrees = (self.n_actions - 1) * self.n_states *\
+                (self.n_states - 1)
         self.use_a1 = False # flag for switching between the basic algorithms
         self.a0_count = 0  # counter of time steps when algorithm a0 is used
         self.a1_count = 0   # counter of time steps when algorithm a1 is used

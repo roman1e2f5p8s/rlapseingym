@@ -18,6 +18,7 @@ import numpy as np
 # from blackhc import mdp
 from gym import Env
 from gym.spaces.discrete import Discrete
+from gym.spaces.box import Box
 
 from rlapse.algorithms._base_alg import BaseRLalg
 
@@ -43,8 +44,10 @@ class Qlearner(BaseRLalg):
         '''
         # assert isinstance(env, mdp.MDPEnv)
         assert isinstance(env, Env)
-        assert isinstance(env.action_space, Discrete)
-        assert isinstance(env.observation_space, Discrete)
+        assert isinstance(env.action_space, Discrete) or \
+                (isinstance(env.action_space, Box) and env.action_space.dtype == int)
+        assert isinstance(env.observation_space, Discrete) or \
+                (isinstance(env.observation_space, Box) and env.observation_space.dtype == int)
         assert 0.0 <= gamma <= 1.0
         assert 0.0 <= epsilon <= 1.0
         assert 0.0 < epsilon_decay_rate <= 1.0
@@ -58,10 +61,20 @@ class Qlearner(BaseRLalg):
         self.epsilon_decay_interval = epsilon_decay_interval
         self.omega = omega
         self.iteration = 0
-        self.lr = np.ones((env.observation_space.n, env.action_space.n))  # learning rate
-        self.Q = np.ones((env.observation_space.n, env.action_space.n))
-        self.policy = np.random.randint(0, env.action_space.n, env.observation_space.n, dtype=np.int32)
-        self.n = np.zeros((env.observation_space.n, env.action_space.n), dtype=np.int32)
+        if isinstance(env.observation_space, Discrete):
+            self.n_states = env.observation_space.n
+        else:
+            self.n_states = np.prod(env.observation_space.high.flatten() - \
+                    env.observation_space.low.flatten() + 1) - 1
+        if isinstance(env.action_space, Discrete):
+            self.n_actions = env.action_space.n
+        else:
+            self.n_actions = np.prod(env.action_space.high.flatten() - \
+                    env.action_space.low.flatten() + 1) - 1
+        self.lr = np.ones((self.n_states, self.n_actions))  # learning rate
+        self.Q = np.ones((self.n_states, self.n_actions))
+        self.policy = np.random.randint(0, self.n_actions, self.n_states, dtype=np.int32)
+        self.n = np.zeros((self.n_states, self.n_actions), dtype=np.int32)
 
     def _get_action_index(self, state_index):
         '''
@@ -79,7 +92,7 @@ class Qlearner(BaseRLalg):
             action_index = np.argmax(self.Q[state_index, :])
             self.policy[state_index] = action_index  # update policy
         else:   # explore
-            action_index = np.random.choice(self.env.action_space.n)
+            action_index = np.random.choice(self.n_actions)
         
         return action_index
 
