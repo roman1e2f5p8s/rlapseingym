@@ -1,5 +1,22 @@
-from numpy import zeros as np_zeros
+import numpy as np
 from blackhc import mdp
+
+
+def _box_state_to_state_index(state, observation_space):
+    L = observation_space.low.flatten()
+    H = observation_space.high.flatten()
+    W = H - L + 1
+    O = state.flatten()
+    K = len(O)
+    return int(sum([(O[i] - L[i]) * W[i]**(K - 1 - i) for i in range(K)]))
+
+
+def _get_state_index(state, observation_space):
+    if np.isscalar(state):
+        return state
+    else:
+        return _box_state_to_state_index(state, observation_space)
+
 
 class BaseRLalg(object):
     def __init__(self):
@@ -13,14 +30,14 @@ class BaseRLalg(object):
 
     def learn(self, total_timesteps, store_reward=False, store_estimated_reward=False, verbose=False):
         if store_reward:
-            self.reward = np_zeros(total_timesteps)
+            self.reward = np.zeros(total_timesteps)
 
         if store_estimated_reward:
             if hasattr(self.env, 'mdp'):
                 from rlapse.mdps.mdp import MDP
                 if isinstance(self.env.mdp, MDP):
                     from rlapse.utils.infhmdp import expected_reward
-                    self.estimated_reward = np_zeros(total_timesteps)
+                    self.estimated_reward = np.zeros(total_timesteps)
                 else:
                     print('This MDP is not an instanse of \'rlapse.mdps.mdp.MDP\',',
                             'estimated rewards will not be stored.')
@@ -30,12 +47,15 @@ class BaseRLalg(object):
                         'estimated rewards will not be stored.')
                 store_estimated_reward = False
 
-        state_index = self.env.reset()
+        state = self.env.reset()
+        state_index = _get_state_index(state, self.env.observation_space)
         for t in range(total_timesteps):
             if verbose:
                 print('{}: step #{}'.format(self.__class__.__name__, t), end='\r')
+
             action_index = self._get_action_index(state_index)
-            next_state_index, reward, _, _ = self.env.step(action_index)
+            next_state, reward, _, _ = self.env.step(action_index)
+            next_state_index = _get_state_index(next_state, self.env.observation_space)
             self._update_params(t, state_index, action_index, next_state_index, reward)
 
             if store_reward:
@@ -55,7 +75,7 @@ class BaseRLalg(object):
         return action, None
     '''
 
-    def predict(self, observation: int):
-        assert isinstance(observation, int)
-        action = self.policy[observation]
-        return action, None
+    def predict(self, state):
+        state_index = _get_state_index(state, self.env.observation_space)
+        action_index = self.policy[state_index]
+        return action_index, None
