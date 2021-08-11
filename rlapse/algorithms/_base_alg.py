@@ -8,7 +8,8 @@ def _box_state_to_state_index(state, observation_space):
     W = H - L + 1
     O = state.flatten()
     K = len(O)
-    return int(sum([(O[i] - L[i]) * W[i]**(K - 1 - i) for i in range(K)]))
+    #return int(sum([(O[i] - L[i]) * W[i]**(K - 1 - i) for i in range(K)]))
+    return int(sum([(O[i] - L[i]) * W[i-1]**(K - 1 - i) for i in range(K)])-1)
 
 
 def _get_state_index(state, observation_space):
