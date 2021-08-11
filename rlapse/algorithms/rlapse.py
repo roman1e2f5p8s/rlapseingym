@@ -74,7 +74,10 @@ class RLAPSE(BaseRLalg):
                     env.action_space.low.flatten() + 1) - 1
         self.m = np.zeros((self.n_actions, self.n_states, self.n_states), int)
         self.n = np.zeros((self.n_states, self.n_actions), int)
+        self.m_prime = np.zeros((self.n_states, self.n_states), int)
         self.n_prime = np.zeros(self.n_states, int)
+        self.ln_l0 = -np.log(self.n_states)
+        self.ln_l1 = -np.log(self.n_states)
         self.freedom_degrees = (self.n_actions - 1) * self.n_states *\
                 (self.n_states - 1)
         self.use_a1 = False # flag for switching between the basic algorithms
@@ -102,6 +105,54 @@ class RLAPSE(BaseRLalg):
 
         return action_index
 
+    def _ln_l0_diff(self, state_index, next_state_index):
+        ln_l0_sum_s_axis = np.dot(self.m_prime[:, next_state_index], (
+            np.log(self.m_prime[:, next_state_index], where=(self.m_prime[:, next_state_index] > 0)) - \
+            np.log(self.n_prime, where=(self.n_prime > 0))
+            )
+        )
+        ln_l0_sum_sp_axis = np.dot(self.m_prime[state_index], (
+            np.log(self.m_prime[state_index], where=(self.m_prime[state_index] > 0)) - \
+            np.log(self.n_prime[state_index], where=(self.n_prime[state_index] > 0))
+            )
+        )
+        diff = ln_l0_sum_s_axis + ln_l0_sum_sp_axis - \
+            self.m_prime[state_index, next_state_index] * (
+            np.log(self.m_prime[state_index, next_state_index],
+                where=(self.m_prime[state_index, next_state_index] > 0)) - \
+            np.log(self.n_prime[state_index], where=(self.n_prime[state_index] > 0))
+        )
+
+        return diff
+
+    def _ln_l1_diff(self, action_index, state_index, next_state_index):
+        ln_l1_sum_a_axis = np.dot(self.m[:, state_index, next_state_index], (
+            np.log(self.m[:, state_index, next_state_index],
+                where=(self.m[:, state_index, next_state_index] > 0)) - \
+            np.log(self.n[state_index], where=(self.n[state_index] > 0))
+            )
+        )
+        ln_l1_sum_s_axis = np.dot(self.m[action_index, :, next_state_index], (
+            np.log(self.m[action_index, :, next_state_index],
+                where=(self.m[action_index, :, next_state_index] > 0)) - \
+            np.log(self.n[:, action_index], where=(self.n[:, action_index] > 0))
+            )
+        )
+        ln_l1_sum_sp_axis = np.dot(self.m[action_index, state_index], (
+            np.log(self.m[action_index, state_index],
+                where=(self.m[action_index, state_index] > 0)) - \
+            np.log(self.n[state_index, action_index], where=(self.n[state_index, action_index] > 0))
+            )
+        )
+        diff = ln_l1_sum_a_axis + ln_l1_sum_s_axis + ln_l1_sum_sp_axis - \
+            2 * self.m[action_index, state_index, next_state_index] * (
+            np.log(self.m[action_index, state_index, next_state_index],
+                where=(self.m[action_index, state_index, next_state_index] > 0)) - \
+            np.log(self.n[state_index, action_index], where=(self.n[state_index, action_index] > 0))
+        )
+
+        return diff
+
     def _update_params(self, t, state_index, action_index, next_state_index, reward):
         '''
         Updates the parameters of VSRL, 
@@ -113,16 +164,27 @@ class RLAPSE(BaseRLalg):
         Returns:
             - None
         '''
+    
+        # substract corresponding logs before updating the counts
+        self.ln_l0 -= self._ln_l0_diff(state_index, next_state_index)
+        self.ln_l1 -= self._ln_l1_diff(action_index, state_index, next_state_index)
 
+        # update counts
         self.n_prime[state_index] += 1
+        self.m_prime[state_index, next_state_index] += 1
         self.n[state_index, action_index] += 1
         self.m[action_index, state_index, next_state_index] += 1
+
+        # add corresponding logs after updating the counts
+        self.ln_l0 += self._ln_l0_diff(state_index, next_state_index)
+        self.ln_l1 += self._ln_l1_diff(action_index, state_index, next_state_index)
 
         self.a0._update_params(t, state_index, action_index, next_state_index, reward)
         self.a1._update_params(t, state_index, action_index, next_state_index, reward)
 
         if t + 1 > self.t_start:  # turn the orchestrator on after <self.t_start> time steps
-            L = -2.0 * (ln_l0(self.m, self.n_prime) - ln_l1(self.m, self.n))
+            # L = -2.0 * (ln_l0(self.m, self.n_prime) - ln_l1(self.m, self.n))
+            L = -2.0 * (self.ln_l0 - self.ln_l1)
             FL = cdf(L, self.freedom_degrees)
 
             self.use_a1 = True if (FL >= 1 - self.significance_level) else False

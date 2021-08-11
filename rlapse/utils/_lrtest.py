@@ -36,6 +36,25 @@ def ln_l0(m, n_prime):
     return lnl0
 
 
+def ln_l0_(m_prime, n_prime, n_states):
+    '''
+    Computes logarithm of the maximum likelihood of model M0 (i.e. open-loop assumption)
+    Parameters:
+        - m_prime -- array of transition counts m'(c',c), np.ndarray((S,S), dtype=int)
+        - n_prime -- array of transition counts n'(c), np.ndarray(S, dtype=int)
+        - n_states -- number of states, int
+    Returns:
+        - lnl0 -- logarithm of the maximum likelihood l0, float
+    '''
+
+    lnl0 = sum([np.dot(m_prime[:, sp],
+        np.log(m_prime[:, sp], where=(m_prime[:, sp] > 0)) - np.log(n_prime, where=(n_prime > 0))) \
+        for sp in range(n_states)])
+    # lnl0 = np.sum(m_prime @ (np.log(m_prime, where=(m_prime > 0)) - np.log(n_prime, where=(n_prime > 0))))
+
+    return lnl0 - np.log(n_states)
+
+
 def ln_l1(m, n):
     '''
     Computes logarithm of the maximum likelihood of model M1 (i.e. closed-loop assumption)
