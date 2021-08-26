@@ -12,7 +12,8 @@ import numpy as np
 from scipy.special import gammainc
 
 
-def ln_l0(m, n_prime):
+# def ln_l0(m, n_prime):
+def ln_l0(m, n_prime, A, S):
     '''
     Computes logarithm of the maximum likelihood of model M0 (i.e. open-loop assumption)
     Parameters:
@@ -22,16 +23,19 @@ def ln_l0(m, n_prime):
         - lnl0 -- logarithm of the maximum likelihood l0, float
     '''
 
-    A, S, _ = m.shape  # number of actions and states
+    # A, S, _ = m.shape  # number of actions and states
 
     lnl0 = - np.log(S)
     for r in range(S):
         for c in range(S):
             m_prime = 0
             for a in range(A):
-                m_prime += m[a, r, c]
-            if n_prime[r] > 0 and m_prime > 0:
-                lnl0 += m_prime * (np.log(m_prime) - np.log(n_prime[r]))
+                # m_prime += m[a, r, c]
+                m_prime += m[a * S + r, c]
+            # if n_prime[r] > 0 and m_prime > 0:
+                # lnl0 += m_prime * (np.log(m_prime) - np.log(n_prime[r]))
+            if n_prime[0, r] > 0 and m_prime > 0:
+                lnl0 += m_prime * (np.log(m_prime) - np.log(n_prime[0, r]))
 
     return lnl0
 
@@ -55,7 +59,7 @@ def ln_l0_(m_prime, n_prime, n_states):
     return lnl0 - np.log(n_states)
 
 
-def ln_l1(m, n):
+def ln_l1(m, n, S, A):
     '''
     Computes logarithm of the maximum likelihood of model M1 (i.e. closed-loop assumption)
     Parameters:
@@ -64,14 +68,16 @@ def ln_l1(m, n):
     Returns:
         - lnl1 -- logarithm of the maximum likelihood l1, float
     '''
-    S, A = n.shape # number of states and actions
+    # S, A = n.shape # number of states and actions
 
     lnl1 = - np.log(S)
     for a in range(A):
         for r in range(S):
             for c in range(S):
-                if n[r, a] > 0 and m[a, r, c] > 0:
-                    lnl1 += m[a, r, c] * (np.log(m[a, r, c]) - np.log(n[r, a]))
+                # if n[r, a] > 0 and m[a, r, c] > 0:
+                    # lnl1 += m[a, r, c] * (np.log(m[a, r, c]) - np.log(n[r, a]))
+                if n[r, a] > 0 and m[a * S + r, c] > 0:
+                    lnl1 += m[a * S + r, c] * (np.log(m[a * S + r, c]) - np.log(n[r, a]))
 
     return lnl1
 

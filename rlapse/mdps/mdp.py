@@ -56,20 +56,37 @@ class MDP(mdp.MDPSpec):
         self._add_states()
         self._add_actions()
         self._add_transitions()
+
+    def validate(self):
+        print('Validating MDP... ', end='\r')
+        super().validate()
+        print('Validating MDP... Done!')
+    
+    def to_env(self):
+        print('Converting MDP to GYM environment... ', end='\r')
+        env = super().to_env()
+        print('Converting MDP to GYM environment... Done!')
+        return env
     
     def __repr__(self):
         return 'MDP(states=%s, actions=%s, state_outcomes=%s, reward_outcomes=%s)' % (self.states,
                 self.actions, dict(self.state_outcomes), dict(self.reward_outcomes))
-
+    
     def _add_states(self):
+        print('Adding {} states to MDP object... '.format(self.n_states), end='\r')
         for s in range(self.n_states):
             self.state()
+        print('Adding {} states to MDP object... Done!'.format(self.n_states))
 
     def _add_actions(self):
+        print('Adding {} actions to MDP object... '.format(self.n_actions), end='\r')
         for a in range(self.n_actions):
             self.action()
+        print('Adding {} actions to MDP object... Done!'.format(self.n_actions))
 
     def _add_transitions(self):
+        print('Adding {} transitions to MDP object... '.format(self.n_actions*self.n_states**2),
+                end='\r')
         for a in range(self.n_actions):
             action = self.actions[a]
             for s in range(self.n_states):
@@ -79,6 +96,7 @@ class MDP(mdp.MDPSpec):
                         state=self.states[ns],
                         weight=self.P[a, s, ns]))
                 self.transition(state, action, mdp.Reward(value=self.R[s, a], weight=1.0))
+        print('Adding {} transitions to MDP object... Done!'.format(self.n_actions*self.n_states**2))
 
 
 class RestaurantMDP(MDP):
@@ -150,11 +168,19 @@ class RandomMDP(MDP):
             raise TypeError('Reward distribution must be of type {}!'.format(Distribution))
         # error checking end *******************************************************
 
+        print('Allocating {}x{} reward matrix... '.format(n_states, n_actions), end='\r')
         R = R_distribution.sample(size=(n_states, n_actions)).astype(float)
-        if len(R.shape) == 3:
-            R = R.mean(axis=-1)
+        print('Allocating {}x{} reward matrix... Done!'.format(n_states, n_actions))
+        # if len(R.shape) == 3:
+            # R = R.mean(axis=-1)
 
+        print('Allocating {}x{}x{} tensor of transition probabilities... '.format(n_actions,
+            n_states, n_states), end='\r')
         P = np.zeros(shape=(n_actions, n_states, n_states), dtype=float)
+        # P = np.zeros(shape=(1, n_states, n_states), dtype=float)
+        # t = n_actions
+        # n_actions = 1
+        # self.P = np.memmap('P.dat', shape=(n_actions, n_states, n_states), dtype=float, mode='w+')
         if controlled:
             if rank1pages:
                 prob_distr_repr = 'p(s\'|s,a) = mu(s\'|a)'
@@ -281,6 +307,9 @@ class RandomMDP(MDP):
 
                     for a in range(n_actions):
                         P[a, s] = p
+        print('Allocating {}x{}x{} tensor of transition probabilities... Done!'.format(n_actions,
+            n_states, n_states))
+        # n_actions = t
 
         super().__init__(n_states, n_actions, P, R)
 

@@ -15,6 +15,7 @@ Contact: anon.email@domain.com
 '''
 
 import numpy as np
+from scipy.sparse import dok_matrix
 # from blackhc import mdp
 from gym import Env
 from gym.spaces.discrete import Discrete
@@ -71,10 +72,13 @@ class Qlearner(BaseRLalg):
         else:
             self.n_actions = np.prod(env.action_space.high.flatten() - \
                     env.action_space.low.flatten() + 1) - 1
-        self.lr = np.ones((self.n_states, self.n_actions))  # learning rate
+        # self.lr = np.zeros((self.n_states, self.n_actions)) # learning rate
+        self.lr = dok_matrix((self.n_states, self.n_actions), dtype=np.float64) # learning rate
         self.Q = np.ones((self.n_states, self.n_actions))
-        self.policy = np.random.randint(0, self.n_actions, self.n_states, dtype=np.int32)
-        self.n = np.zeros((self.n_states, self.n_actions), dtype=np.int32)
+        # since Q is initialazide to ones, we cannot use parse matrix for it
+        self.policy = np.random.randint(0, self.n_actions, self.n_states, dtype=np.uint64)
+        # self.n = np.zeros((self.n_states, self.n_actions), dtype=np.int32)
+        self.n = dok_matrix((self.n_states, self.n_actions), dtype=np.uint64)
 
     def _get_action_index(self, state_index):
         '''

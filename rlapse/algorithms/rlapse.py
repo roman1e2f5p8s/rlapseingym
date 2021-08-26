@@ -10,10 +10,11 @@ Contact: anon.email@domain.com
 
 import numpy as np
 # from blackhc import mdp
+from scipy.sparse import dok_matrix
 from gym import Env
 from gym.spaces.discrete import Discrete
 from gym.spaces.box import Box
-from copy import deepcopy
+# from copy import deepcopy
 
 from rlapse.algorithms._base_alg import BaseRLalg
 from rlapse.algorithms.qlearning import Qlearner
@@ -54,11 +55,27 @@ class RLAPSE(BaseRLalg):
         assert isinstance(a0, Qlearner)
         assert isinstance(a1, Qlearner)
         assert 0.0 < significance_level <= 1.0
-        assert t_start >= 1
+        assert t_start >= 0
 
         self.env = env
-        self.a0 = deepcopy(a0)
-        self.a1 = deepcopy(a1)
+        # self.a0 = deepcopy(a0)
+        # self.a1 = deepcopy(a1)
+        self.a0 = Qlearner(
+                env=env,
+                gamma=a0.gamma,
+                epsilon=a0.epsilon,
+                epsilon_decay_rate=a0.epsilon_decay_rate,
+                epsilon_decay_interval=a0.epsilon_decay_interval,
+                omega=a0.omega,
+                )
+        self.a1 = Qlearner(
+                env=env,
+                gamma=a1.gamma,
+                epsilon=a1.epsilon,
+                epsilon_decay_rate=a1.epsilon_decay_rate,
+                epsilon_decay_interval=a1.epsilon_decay_interval,
+                omega=a1.omega,
+                )
         self.significance_level = significance_level
         self.t_start = t_start
 
@@ -72,10 +89,17 @@ class RLAPSE(BaseRLalg):
         else:
             self.n_actions = np.prod(env.action_space.high.flatten() - \
                     env.action_space.low.flatten() + 1) - 1
-        self.m = np.zeros((self.n_actions, self.n_states, self.n_states), int)
-        self.n = np.zeros((self.n_states, self.n_actions), int)
-        self.m_prime = np.zeros((self.n_states, self.n_states), int)
-        self.n_prime = np.zeros(self.n_states, int)
+
+        # self.m_prime = np.zeros((self.n_states, self.n_states), int)
+        self.m_prime = dok_matrix((self.n_states, self.n_states), dtype=np.uint64)
+        # self.n_prime = np.zeros(self.n_states, int)
+        self.n_prime = dok_matrix((1, self.n_states), dtype=np.uint64)
+
+        # self.m = np.zeros((self.n_actions, self.n_states, self.n_states), int)
+        self.m = dok_matrix((self.n_actions * self.n_states, self.n_states), dtype=np.uint64)
+        # self.n = np.zeros((self.n_states, self.n_actions), int)
+        self.n = dok_matrix((self.n_states, self.n_actions), dtype=np.uint64)
+
         self.ln_l0 = -np.log(self.n_states)
         self.ln_l1 = -np.log(self.n_states)
         self.freedom_degrees = (self.n_actions - 1) * self.n_states *\
@@ -83,7 +107,7 @@ class RLAPSE(BaseRLalg):
         self.use_a1 = False # flag for switching between the basic algorithms
         self.a0_count = 0  # counter of time steps when algorithm a0 is used
         self.a1_count = 0   # counter of time steps when algorithm a1 is used
-        self.used_a0 = np.empty(0, int) # array to store the number of switches to a0 at given time step
+        self.used_a0 = np.empty(0, dtype=np.uint8) # array to store switches to a0 at given time step
         self.policy = a0.policy
     
     def _get_action_index(self, state_index):
@@ -106,26 +130,30 @@ class RLAPSE(BaseRLalg):
         return action_index
 
     def _ln_l0_diff(self, state_index, next_state_index):
+        '''
         ln_l0_sum_s_axis = np.dot(self.m_prime[:, next_state_index], (
             np.log(self.m_prime[:, next_state_index], where=(self.m_prime[:, next_state_index] > 0)) - \
             np.log(self.n_prime, where=(self.n_prime > 0))
             )
         )
-        ln_l0_sum_sp_axis = np.dot(self.m_prime[state_index], (
-            np.log(self.m_prime[state_index], where=(self.m_prime[state_index] > 0)) - \
-            np.log(self.n_prime[state_index], where=(self.n_prime[state_index] > 0))
-            )
-        )
+        '''
+        val = self.n_prime[0, state_index]
+        # row = self.m_prime[state_index]
+        row = self.m_prime.getrow(state_index).toarray()[0]
+        ln_l0_sum_sp_axis = np.dot(row, (np.log(row, where=(row > 0)) - np.log(val, where=(val > 0))))
+        '''
         diff = ln_l0_sum_s_axis + ln_l0_sum_sp_axis - \
             self.m_prime[state_index, next_state_index] * (
             np.log(self.m_prime[state_index, next_state_index],
                 where=(self.m_prime[state_index, next_state_index] > 0)) - \
             np.log(self.n_prime[state_index], where=(self.n_prime[state_index] > 0))
         )
-
-        return diff
+        '''
+        return ln_l0_sum_sp_axis
+        # return diff
 
     def _ln_l1_diff(self, action_index, state_index, next_state_index):
+        '''
         ln_l1_sum_a_axis = np.dot(self.m[:, state_index, next_state_index], (
             np.log(self.m[:, state_index, next_state_index],
                 where=(self.m[:, state_index, next_state_index] > 0)) - \
@@ -138,20 +166,21 @@ class RLAPSE(BaseRLalg):
             np.log(self.n[:, action_index], where=(self.n[:, action_index] > 0))
             )
         )
-        ln_l1_sum_sp_axis = np.dot(self.m[action_index, state_index], (
-            np.log(self.m[action_index, state_index],
-                where=(self.m[action_index, state_index] > 0)) - \
-            np.log(self.n[state_index, action_index], where=(self.n[state_index, action_index] > 0))
-            )
-        )
+        '''
+        val = self.n[state_index, action_index]
+        # row = self.m[action_index, state_index]
+        row = self.m.getrow(action_index * self.n_states + state_index).toarray()[0]
+        ln_l1_sum_sp_axis = np.dot(row, (np.log(row, where=(row > 0)) - np.log(val, where=(val > 0))))
+        '''
         diff = ln_l1_sum_a_axis + ln_l1_sum_s_axis + ln_l1_sum_sp_axis - \
             2 * self.m[action_index, state_index, next_state_index] * (
             np.log(self.m[action_index, state_index, next_state_index],
                 where=(self.m[action_index, state_index, next_state_index] > 0)) - \
             np.log(self.n[state_index, action_index], where=(self.n[state_index, action_index] > 0))
         )
-
-        return diff
+        '''
+        return ln_l1_sum_sp_axis
+        # return diff
 
     def _update_params(self, t, state_index, action_index, next_state_index, reward):
         '''
@@ -170,10 +199,13 @@ class RLAPSE(BaseRLalg):
         self.ln_l1 -= self._ln_l1_diff(action_index, state_index, next_state_index)
 
         # update counts
-        self.n_prime[state_index] += 1
+        # self.n_prime[state_index] += 1
+        self.n_prime[0, state_index] += 1
         self.m_prime[state_index, next_state_index] += 1
+
         self.n[state_index, action_index] += 1
-        self.m[action_index, state_index, next_state_index] += 1
+        # self.m[action_index, state_index, next_state_index] += 1
+        self.m[action_index * self.n_states + state_index, next_state_index] += 1
 
         # add corresponding logs after updating the counts
         self.ln_l0 += self._ln_l0_diff(state_index, next_state_index)
@@ -184,6 +216,8 @@ class RLAPSE(BaseRLalg):
 
         if t + 1 > self.t_start:  # turn the orchestrator on after <self.t_start> time steps
             # L = -2.0 * (ln_l0(self.m, self.n_prime) - ln_l1(self.m, self.n))
+            # L = -2.0 * (ln_l0(self.m, self.n_prime, self.n_actions, self.n_actions) - \
+                    # ln_l1(self.m, self.n, self.n_actions, self.n_actions))
             L = -2.0 * (self.ln_l0 - self.ln_l1)
             FL = cdf(L, self.freedom_degrees)
 
