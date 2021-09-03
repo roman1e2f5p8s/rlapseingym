@@ -74,8 +74,8 @@ class Qlearner(BaseRLalg):
                     env.action_space.low.flatten() + 1) - 1
         # self.lr = np.zeros((self.n_states, self.n_actions)) # learning rate
         self.lr = dok_matrix((self.n_states, self.n_actions), dtype=np.float64) # learning rate
-        self.Q = np.ones((self.n_states, self.n_actions))
-        # since Q is initialazide to ones, we cannot use parse matrix for it
+        # self.Q = np.ones((self.n_states, self.n_actions))
+        self.Q = dok_matrix((self.n_states, self.n_actions), dtype=np.float64)
         self.policy = np.random.randint(0, self.n_actions, self.n_states, dtype=np.uint64)
         # self.n = np.zeros((self.n_states, self.n_actions), dtype=np.int32)
         self.n = dok_matrix((self.n_states, self.n_actions), dtype=np.uint64)
@@ -93,8 +93,9 @@ class Qlearner(BaseRLalg):
         '''
 
         if np.random.rand() > self.epsilon: # exploit
-            action_index = np.argmax(self.Q[state_index, :])
-            self.policy[state_index] = action_index  # update policy
+            # action_index = np.argmax(self.Q[state_index])
+            action_index = np.argmax(self.Q.getrow(state_index))
+            # self.policy[state_index] = action_index  # update policy
         else:   # explore
             action_index = np.random.choice(self.n_actions)
         
@@ -130,8 +131,10 @@ class Qlearner(BaseRLalg):
         self.Q[state_index, action_index] = (
                 self.Q[state_index, action_index] +\
                 self.lr[state_index, action_index] * (
-                    reward + self.gamma * np.max(self.Q[next_state_index]) -\
-                            self.Q[state_index, action_index]
+                    # reward + self.gamma * np.max(self.Q[next_state_index]) -\
+                            # self.Q[state_index, action_index]
+                    reward + self.gamma * (np.max(self.Q.getrow(next_state_index)) + 1) -\
+                            self.Q[state_index, action_index] - 1
                             )
                 )
 
