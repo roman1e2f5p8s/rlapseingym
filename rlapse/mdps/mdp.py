@@ -171,8 +171,8 @@ class RandomMDP(MDP):
         print('Allocating {}x{} reward matrix... '.format(n_states, n_actions), end='\r')
         R = R_distribution.sample(size=(n_states, n_actions)).astype(float)
         print('Allocating {}x{} reward matrix... Done!'.format(n_states, n_actions))
-        # if len(R.shape) == 3:
-            # R = R.mean(axis=-1)
+        if len(R.shape) == 3:
+            R = R.mean(axis=-1)
 
         print('Allocating {}x{}x{} tensor of transition probabilities... '.format(n_actions,
             n_states, n_states), end='\r')

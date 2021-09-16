@@ -143,10 +143,9 @@ def test_value_iteration():
     vi = ValueIteration(R, P)
 
 
+'''
 def test_lrtest():
-    '''
-    Test the likelihood-ratio test functions
-    '''
+    # Test the likelihood-ratio test functions
     n_states, n_actions = 5, 3
     m = np.random.randint(low=0, high=1000, size=(n_actions, n_states, n_states), dtype=int)
     n = m.sum(axis=2).T   # (n_states, n_actions)
@@ -156,3 +155,4 @@ def test_lrtest():
     L = -2.0 * (l0 - l1)
     DOF = (n_actions - 1) * n_states * (n_states - 1)
     FL = cdf(L, DOF)
+'''

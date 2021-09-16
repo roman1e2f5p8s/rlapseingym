@@ -18,7 +18,7 @@ from gym.spaces.box import Box
 
 from rlapse.algorithms._base_alg import BaseRLalg
 from rlapse.algorithms.qlearning import Qlearner
-from rlapse.utils._lrtest import *
+import rlapse.utils._lrtest as lr
 
 
 class RLAPSE(BaseRLalg):
@@ -219,7 +219,7 @@ class RLAPSE(BaseRLalg):
             # L = -2.0 * (ln_l0(self.m, self.n_prime, self.n_actions, self.n_actions) - \
                     # ln_l1(self.m, self.n, self.n_actions, self.n_actions))
             L = -2.0 * (self.ln_l0 - self.ln_l1)
-            FL = cdf(L, self.freedom_degrees)
+            FL = lr.cdf(L, self.freedom_degrees)
 
             self.use_a1 = True if (FL >= 1 - self.significance_level) else False
 
