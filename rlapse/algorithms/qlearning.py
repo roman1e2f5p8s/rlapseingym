@@ -95,7 +95,7 @@ class Qlearner(BaseRLalg):
         if np.random.rand() > self.epsilon: # exploit
             # action_index = np.argmax(self.Q[state_index])
             action_index = np.argmax(self.Q.getrow(state_index))
-            # self.policy[state_index] = action_index  # update policy
+            self.policy[state_index] = action_index  # update policy
         else:   # explore
             action_index = np.random.choice(self.n_actions)
         
