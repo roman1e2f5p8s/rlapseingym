@@ -225,15 +225,18 @@ class RLAPSE(BaseRLalg):
 
             if not self.use_a1:  # use algorithm a0
                 self.used_a0 = np.append(self.used_a0, 1)
-                self.policy = self.a0.policy
+                # self.policy = self.a0.policy
+                self.policy[state_index] = self.a0.policy[state_index]
                 self.a0_count += 1
-                self.a1.policy[state_index] = self.policy[state_index]
+                # self.a1.policy[state_index] = self.policy[state_index]
             else:  # use algorithm a1
                 self.used_a0 = np.append(self.used_a0, 0)
-                self.policy = self.a1.policy
+                # self.policy = self.a1.policy
+                self.policy[state_index] = self.a1.policy[state_index]
                 self.a1_count += 1
-                self.a0.policy[state_index] = self.policy[state_index]
+                # self.a0.policy[state_index] = self.policy[state_index]
         else:  # use algorithm a0
             self.used_a0 = np.append(self.used_a0, 1)
-            self.policy = self.a0.policy
-            self.a1.policy[state_index] = self.policy[state_index]
+            # self.policy = self.a0.policy
+            self.policy[state_index] = self.a0.policy[state_index]
+            # self.a1.policy[state_index] = self.policy[state_index]
