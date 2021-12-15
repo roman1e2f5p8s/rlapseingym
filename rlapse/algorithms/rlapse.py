@@ -15,6 +15,7 @@ from gym import Env
 from gym.spaces.discrete import Discrete
 from gym.spaces.box import Box
 # from copy import deepcopy
+from time import time
 
 from rlapse.algorithms._base_alg import BaseRLalg
 from rlapse.algorithms.qlearning import Qlearner
@@ -109,6 +110,7 @@ class RLAPSE(BaseRLalg):
         self.a1_count = 0   # counter of time steps when algorithm a1 is used
         self.used_a0 = np.empty(0, dtype=np.uint8) # array to store switches to a0 at given time step
         self.policy = a0.policy
+        # self.l0l1_comp_time = []
     
     def _get_action_index(self, state_index):
         '''
@@ -193,10 +195,13 @@ class RLAPSE(BaseRLalg):
         Returns:
             - None
         '''
+
     
         # substract corresponding logs before updating the counts
+        # start_time = time()
         self.ln_l0 -= self._ln_l0_diff(state_index, next_state_index)
         self.ln_l1 -= self._ln_l1_diff(action_index, state_index, next_state_index)
+        # self.l0l1_comp_time += [time() - start_time]
 
         # update counts
         # self.n_prime[state_index] += 1
@@ -208,16 +213,22 @@ class RLAPSE(BaseRLalg):
         self.m[action_index * self.n_states + state_index, next_state_index] += 1
 
         # add corresponding logs after updating the counts
+        # start_time = time()
         self.ln_l0 += self._ln_l0_diff(state_index, next_state_index)
         self.ln_l1 += self._ln_l1_diff(action_index, state_index, next_state_index)
+        # self.l0l1_comp_time[-1] += time() - start_time
 
         self.a0._update_params(t, state_index, action_index, next_state_index, reward)
         self.a1._update_params(t, state_index, action_index, next_state_index, reward)
 
         if t + 1 > self.t_start:  # turn the orchestrator on after <self.t_start> time steps
             # L = -2.0 * (ln_l0(self.m, self.n_prime) - ln_l1(self.m, self.n))
-            # L = -2.0 * (ln_l0(self.m, self.n_prime, self.n_actions, self.n_actions) - \
-                    # ln_l1(self.m, self.n, self.n_actions, self.n_actions))
+            # old non-recusrive approach to compute the likelihoods
+            # start_time = time()
+            # self.ln_l0 = lr.ln_l0(self.m, self.n_prime, self.n_actions, self.n_actions)
+            # self.ln_l1 = lr.ln_l1(self.m, self.n, self.n_actions, self.n_actions)
+            # self.l0l1_comp_time += [time() - start_time]
+
             L = -2.0 * (self.ln_l0 - self.ln_l1)
             FL = lr.cdf(L, self.freedom_degrees)
 
